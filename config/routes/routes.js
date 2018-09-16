@@ -1,6 +1,4 @@
-const Joi = require('joi');
-
-const Boom = require('boom');
+'use strict';
 
 const handler = require('./../../lib/handler');
 

@@ -8,8 +8,8 @@
   "scripts": {
     "test": "gulp tests",
     "start": "node server.js",
-    "lint": "./node_modules/.bin/eslint ./ --quiet",
-    "lint-fix": "./node_modules/.bin/eslint ./ --fix",
+    "lint": "eslint ./ --quiet",
+    "lint-fix": "eslint ./ --fix",
     "start-dev": "nodemon",
     "precommit": "npm run lint",
     "prepush": "npm run lint"
@@ -20,6 +20,7 @@
     "config": "^1.16.0",
     "continuation-local-storage": "3.2.0",
     "error-response": "file:sub-modules/error-response",
+    "gulp-env": "^0.4.0",
     "hapi": "^9.0.3",
     "hapi-bodyparser": "git+https://github.com/SmarterServices/hapi-bodyparser.git#master",
     "hapi-json-view": "git+https://github.com/SmarterServices/hapi-json-view.git",
@@ -49,6 +50,7 @@
     "gulp-yuidoc": "^0.1.2",
     "husky": "^0.14.3",
     "mocha": "^2.3.0",
+    "mocha-generators": "^2.0.0",
     "ss-node-force": "git+https://65ed9f5031f63b7ed211e799138db3cb65e36ca7:x-oauth-basic@github.com/SmarterServices/node-force.git#node-force-module"
   }
 }

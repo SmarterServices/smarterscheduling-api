@@ -15,9 +15,9 @@
 
 module.exports = {
   /**
-   * Get first page url
+   * Get last page url
    * @param {Page} page - The page object
-   * @return {string} - The url of first page
+   * @returns {string} - Url of the first page
    */
   getFirstUrl(page) {
     const url = getUrl(page);
@@ -27,7 +27,7 @@ module.exports = {
   /**
    * Get last page url
    * @param {Page} page - The page object
-   * @return {string} - The url of last page
+   * @returns {string} - Url of the last page
    */
   getLastUrl(page) {
     const limit = parseInt(page.query.limit) || 0;
@@ -48,7 +48,7 @@ module.exports = {
   /**
    * Get next page url
    * @param {Page} page - The page object
-   * @return {string} - The url of next page
+   * @returns {string} - Url of the next page
    */
   getNextUrl(page) {
     const limit = parseInt(page.query.limit) || 0;
@@ -66,7 +66,7 @@ module.exports = {
   /**
    * Get previous page url
    * @param {Page} page - The page object
-   * @return {string} - The url of previous page
+   * @returns {string} - Url of the previous page
    */
   getPrevUrl(page) {
     const limit = parseInt(page.query.limit) || 0;
@@ -81,6 +81,43 @@ module.exports = {
     return prevUrl;
   },
 
+  /**
+   * @typedef Fee
+   * @property {number} minimumSessionLength - Minimum session length
+   * @property {number} maximumSessionLength - Maximum session length
+   */
+
+  /**
+   * this function groups the fees array by minimumSessionLength
+   * @param {Fee[]} fees - Array of fees
+   * @returns {Object[]} - Array of grouped fees
+   */
+  proctorGroupFees(fees) {
+    // this will keep track of a range
+    const rangeMap = {};
+    const groupedFees = [];
+
+    fees = fees || [];
+
+    for (let i = 0; i < fees.length; ++i) {
+      const currentFee = fees[i];
+      // holding minimumSessionLength as a range identifier
+      const currentRange = currentFee.minimumSessionLength;
+      rangeMap[currentRange] = rangeMap[currentRange] || {};
+      rangeMap[currentRange].data = rangeMap[currentRange].data || [];
+      // save this ranges' min and max
+      rangeMap[currentRange].minimumSessionLength = currentFee.minimumSessionLength;
+      rangeMap[currentRange].maximumSessionLength = currentFee.maximumSessionLength;
+      // push each fee of this range data in the ranges' data array
+      rangeMap[currentRange].data.push(currentFee);
+    }
+
+    for (const key in rangeMap) {
+      groupedFees.push(rangeMap[key]);
+    }
+
+    return groupedFees;
+  }
 
 };
 
@@ -88,7 +125,7 @@ module.exports = {
 /**
  * Get page url
  * @param {Page} page - The page object
- * @return {string} - The url
+ * @returns {string} - Required page url
  */
 function getUrl(page) {
   let url = page.endpoint + '?';
@@ -109,7 +146,7 @@ function getUrl(page) {
  * Build query string for array
  * @param {Page} page - The page object
  * @param {string} key - The key in query object
- * @return {string} - The query string to append
+ * @returns {string} - Required query string
  */
 function buildArrayQueryString(page, key) {
   let queryString = '';

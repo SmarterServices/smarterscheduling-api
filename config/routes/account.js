@@ -1,13 +1,12 @@
-
 'use strict';
 
-var Joi = require('joi');
+const Joi = require('joi');
 
-var schemaProvider = require('./schema/schema-provider');
-var accountSchema = schemaProvider.schema['account'];
+const schemaProvider = require('./schema/schema-provider');
+const accountSchema = schemaProvider.schema['account'];
 
-var Boom = require('boom');
-var AccountHandler = require('./../../lib/handlers/account');
+const Boom = require('boom');
+const AccountHandler = require('./../../lib/handlers/account');
 
 module.exports = [{
   method: 'POST',
@@ -15,7 +14,7 @@ module.exports = [{
   config: {
     handler: function (request, reply) {
 
-      var opts = {
+      const opts = {
         applicationId: request.params.applicationId,
         payload: request.payload
       };
@@ -26,27 +25,27 @@ module.exports = [{
         } else {
           reply.view('partials/account', {account: r});
         }
-      })
+      });
     },
     tags: ['api', 'account'],
     description: 'Add account',
     validate: {
-      params:{
+      params: {
         applicationId: Joi
           .string()
           .required()
-          .description('Application Id')},
+          .description('Application Id')
+      },
       payload: accountSchema
     }
   }
-},
-{
+}, {
   method: 'GET',
   path: '/v1/application/{applicationId}/accounts',
   config: {
     handler: function (request, reply) {
 
-      var opts = {
+      const opts = {
         applicationId: request.params.applicationId,
         startKey: request.query.startKey,
         limit: request.query.limit,
@@ -58,23 +57,24 @@ module.exports = [{
           reply(Boom.badRequest(err));
         } else {
           reply.view('accountCollection',
-          {
-            account: r,
-            endpoint: request.server.info.uri +
+            {
+              account: r,
+              endpoint: request.server.info.uri +
               request.path
-          });
+            });
         }
-      })
+      });
     },
     tags: ['api', 'account'],
     description: 'List account',
     validate: {
-      params:{
+      params: {
         applicationId: Joi
           .string()
           .required()
-          .description('Application Id')},
-      query: { 
+          .description('Application Id')
+      },
+      query: {
         startKey: Joi
           .any()
           .description('Id to get next portion of query data. For 1st query should pass as empty'),
@@ -85,14 +85,13 @@ module.exports = [{
       }
     }
   }
-},
-{
+}, {
   method: 'GET',
   path: '/v1/application/{applicationId}/accounts/{accountId}',
   config: {
     handler: function (request, reply) {
 
-      var opts = {
+      const opts = {
         applicationId: request.params.applicationId,
         accountId: request.params.accountId,
         payload: request.payload
@@ -104,12 +103,12 @@ module.exports = [{
         } else {
           reply.view('partials/account', {account: r});
         }
-      })
+      });
     },
     tags: ['api', 'account'],
     description: 'Get account',
     validate: {
-      params:{
+      params: {
         applicationId: Joi
           .string()
           .required()
@@ -118,17 +117,17 @@ module.exports = [{
         accountId: Joi
           .string()
           .required()
-          .description('Account Id')}
+          .description('Account Id')
+      }
     }
   }
-},
-{
+}, {
   method: 'PUT',
   path: '/v1/application/{applicationId}/accounts/{accountId}',
   config: {
     handler: function (request, reply) {
 
-      var opts = {
+      const opts = {
         applicationId: request.params.applicationId,
         accountId: request.params.accountId,
         payload: request.payload
@@ -138,14 +137,14 @@ module.exports = [{
         if (err) {
           reply(Boom.badRequest(err));
         } else {
-          reply(r)
+          reply(r);
         }
-      })
+      });
     },
     tags: ['api', 'account'],
     description: 'Update account',
     validate: {
-      params:{
+      params: {
         applicationId: Joi
           .string()
           .required()
@@ -154,18 +153,18 @@ module.exports = [{
         accountId: Joi
           .string()
           .required()
-          .description('Account Id')},
+          .description('Account Id')
+      },
       payload: accountSchema
     }
   }
-},
-{
+}, {
   method: 'DELETE',
   path: '/v1/application/{applicationId}/accounts/{accountId}',
   config: {
     handler: function (request, reply) {
 
-      var opts = {
+      const opts = {
         applicationId: request.params.applicationId,
         accountId: request.params.accountId,
         payload: request.payload
@@ -175,14 +174,14 @@ module.exports = [{
         if (err) {
           reply(Boom.badRequest(err));
         } else {
-          reply(r)
+          reply(r);
         }
-      })
+      });
     },
     tags: ['api', 'account'],
     description: 'Delete account',
     validate: {
-      params:{
+      params: {
         applicationId: Joi
           .string()
           .required()
@@ -191,7 +190,8 @@ module.exports = [{
         accountId: Joi
           .string()
           .required()
-          .description('Account Id')}
+          .description('Account Id')
+      }
     }
   }
 }];

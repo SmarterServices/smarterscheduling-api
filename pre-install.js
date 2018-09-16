@@ -1,15 +1,15 @@
-
-var shelljs = require('shelljs');
-var os = require('os');
+'use strict';
+const shelljs = require('shelljs');
+const os = require('os');
 
 /*
  What platform you're running on: 'darwin', 'freebsd', 'linux', 'sunos' or 'win32'
  win32 (for 32 or 64 bit)
  */
 
-var isWin = /^win32/.test(os.platform());
-var isLinux = /^linux/.test(os.platform());
-var isMac = /^darwin/.test(os.platform()) || /^freebsd/.test(os.platform());
+const isWin = /^win32/.test(os.platform());
+const isLinux = /^linux/.test(os.platform());
+const isMac = /^darwin/.test(os.platform()) || /^freebsd/.test(os.platform());
 
 shelljs.echo('*************************** pre install postgres!!! ************************************');
 

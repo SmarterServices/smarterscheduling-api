@@ -1,4 +1,6 @@
-var Joi = require('joi');
+'use strict';
+
+const Joi = require('joi');
 
 module.exports = Joi.object({
   isDeleted: Joi
@@ -18,5 +20,5 @@ module.exports = Joi.object({
     .required()
     .description('System Modstamp')
 })
-.required()
-.description('Account payload');
+  .required()
+  .description('Account payload');
