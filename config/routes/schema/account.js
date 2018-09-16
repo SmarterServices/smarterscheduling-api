@@ -4,8 +4,6 @@ const joi = require('joi');
 
 const schema = {
   add: {
-    params: joi
-      .object({}),
     payload: joi.object({
       title: joi
         .string()
@@ -84,8 +82,6 @@ const schema = {
       })
   },
   list: {
-    params: joi
-      .object({}),
     query: {
       offset: joi
         .number()
@@ -99,12 +95,16 @@ const schema = {
         .description('Number of items to return'),
       sortKeys: joi
         .array()
-        .items(joi.string())
+        .items(joi
+          .string()
+          .valid('createdDate')
+        )
         .single()
-        .default([])
+        .default(['createdDate'])
         .description('Keys to sort the data'),
       sortOrder: joi
         .string()
+        .default('ASC')
         .valid('ASC', 'DESC')
         .description('Sort order')
     }
