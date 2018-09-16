@@ -6,7 +6,7 @@
   "license": "MIT",
   "main": "server.js",
   "scripts": {
-    "test": "gulp tests",
+    "test": "gulp test",
     "start": "node server.js",
     "lint": "eslint ./ --quiet",
     "lint-fix": "eslint ./ --fix",
