@@ -1,0 +1,15 @@
+{
+  "name": "error-response",
+  "version": "0.0.1",
+  "description": "This is a module to format error",
+  "main": "index.js",
+  "scripts": {
+    "test": "npm test"
+  },
+  "author": "Muntasir Ahmed",
+  "license": "ISC",
+  "dependencies": {
+    "config": "^1.16.0",
+    "lodash": "^4.17.10"
+  }
+}

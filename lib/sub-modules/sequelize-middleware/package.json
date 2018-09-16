@@ -1,0 +1,30 @@
+{
+  "name": "sequelize-middleware",
+  "version": "0.0.1",
+  "description": "Description",
+  "main": "index.js",
+  "engines": {
+    "node": "6.2.2"
+  },
+  "scripts": {
+  },
+  "nodemonConfig": {
+    "ignore": [
+      "test/*",
+      "coverage/*"
+    ],
+    "delay": "1000",
+    "exec": "cls && node server"
+  },
+  "repository": {
+
+  },
+  "author": "Rafiul Islam",
+  "bugs": {
+  },
+  "dependencies": {
+    "lodash": "^4.17.4",
+    "pg": "^7.4.3",
+    "sequelize": "^4.37.8"
+  }
+}

@@ -1,0 +1,10 @@
+{
+  "id": "id",
+  "isDeleted": "isDeleted",
+  "masterRecordId": "masterRecordId",
+  "name": "name",
+  "parentId": "parentId",
+  "createdDate": "createdDate",
+  "systemModstamp": "systemModstamp",
+  "sid": "sid"
+}
