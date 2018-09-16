@@ -1,48 +1,24 @@
-
 'use strict';
 
 const joi = require('joi');
 
-let schema = {
+const schema = {
   add: {
     params: joi
       .object({}),
-    payload:joi.object({
-     id: joi
-      .string()
+    payload: joi.object({
+      title: joi
+        .string()
+        .required()
+        .description('Title of the account'),
+      externalId: joi
+        .string()
+        .allow(null)
+        .max(255)
+        .description('External ID')
+    })
       .required()
-      .description('Id'),
-   isDeleted: joi
-      .boolean()
-      .required()
-      .description('Is Deleted'),
-   name: joi
-      .string()
-      .required()
-      .description('Name'),
-   createdDate: joi
-      .date()
-      .required()
-      .description('Created Date'),
-   lastModifiedDate: joi
-      .date()
-      .required()
-      .description('Last Modified Date'),
-   systemModstamp: joi
-      .date()
-      .required()
-      .description('System Modstamp'),
-   title: joi
-      .string()
-      .required()
-      .description('Title'),
-   externalId: joi
-      .string()
-      .allow(null)
-      .description('External ID')
-  })
-  .required()
-  .description('Account payload')
+      .description('Account payload')
   },
   get: {
     params: joi
@@ -50,7 +26,8 @@ let schema = {
         accountSid: joi
           .string()
           .required()
-          .description('Account Sid')})
+          .description('Account Sid')
+      })
   },
   update: {
     params: joi
@@ -58,43 +35,44 @@ let schema = {
         accountSid: joi
           .string()
           .required()
-          .description('Account Sid')}),
+          .description('Account Sid')
+      }),
     payload: joi.object({
-     id: joi
-      .string()
+      id: joi
+        .string()
+        .required()
+        .description('Id'),
+      isDeleted: joi
+        .boolean()
+        .required()
+        .description('Is Deleted'),
+      name: joi
+        .string()
+        .required()
+        .description('Name'),
+      createdDate: joi
+        .date()
+        .required()
+        .description('Created Date'),
+      lastModifiedDate: joi
+        .date()
+        .required()
+        .description('Last Modified Date'),
+      systemModstamp: joi
+        .date()
+        .required()
+        .description('System Modstamp'),
+      title: joi
+        .string()
+        .required()
+        .description('Title'),
+      externalId: joi
+        .string()
+        .allow(null)
+        .description('External ID')
+    })
       .required()
-      .description('Id'),
-   isDeleted: joi
-      .boolean()
-      .required()
-      .description('Is Deleted'),
-   name: joi
-      .string()
-      .required()
-      .description('Name'),
-   createdDate: joi
-      .date()
-      .required()
-      .description('Created Date'),
-   lastModifiedDate: joi
-      .date()
-      .required()
-      .description('Last Modified Date'),
-   systemModstamp: joi
-      .date()
-      .required()
-      .description('System Modstamp'),
-   title: joi
-      .string()
-      .required()
-      .description('Title'),
-   externalId: joi
-      .string()
-      .allow(null)
-      .description('External ID')
-  })
-  .required()
-  .description('Account payload')
+      .description('Account payload')
   },
   delete: {
     params: joi
@@ -102,7 +80,8 @@ let schema = {
         accountSid: joi
           .string()
           .required()
-          .description('Account Sid')})
+          .description('Account Sid')
+      })
   },
   list: {
     params: joi
@@ -133,4 +112,3 @@ let schema = {
 };
 
 module.exports = schema;
-    

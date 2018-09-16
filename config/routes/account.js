@@ -5,7 +5,7 @@ const accountSchema = require('./schema/account');
 const accountHandler = require('./../../lib/handlers/account');
 const utils = require('./../../lib/helpers/utils');
 
-module.exports = [/*{
+module.exports = [{
   method: 'POST',
   path: '/v1/accounts',
   config: {
@@ -18,7 +18,7 @@ module.exports = [/*{
 
       accountHandler.addAccount(opts, function (err, r) {
         if (err) {
-          reply(Boom.badRequest(err));
+          errorResponse.formatError(err, null, reply);
         } else {
           utils.replyJson('partials/account', {account: r}, reply);
         }
@@ -31,7 +31,7 @@ module.exports = [/*{
       payload: accountSchema.add.payload
     }
   }
-}, {
+}/*, {
   method: 'GET',
   path: '/v1/accounts',
   config: {

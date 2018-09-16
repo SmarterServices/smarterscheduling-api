@@ -1,2 +1,28 @@
 {
+  "JOI": {
+    "string.regex.name": {
+      "code": "400",
+      "message": "'%key%' with value %value% fails to match the %name% pattern"
+    },
+    "number.base": {
+      "code": "400",
+      "message": "%key% with value %value% must be a number"
+    },
+    "NOT_LISTED": {
+      "code": "4000",
+      "message": "Error Not Listed"
+    },
+    "DEFAULT": {
+      "code": "4000",
+      "message": "Joi validation failed"
+    }
+  },
+  "DEFAULT": {
+    "code": "6000",
+    "message": "Internal error occurred"
+  },
+  "ERROR_NOT_LISTED": {
+    "code": "7000",
+    "message": "Error Not Listed"
+  }
 }
