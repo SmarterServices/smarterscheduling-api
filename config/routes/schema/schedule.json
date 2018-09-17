@@ -1,0 +1,15 @@
+{
+  "id": "id",
+  "isDeleted": "isDeleted",
+  "name": "name",
+  "createdDate": "createdDate",
+  "lastModifiedDate": "lastModifiedDate",
+  "systemModstamp": "systemModstamp",
+  "sid": "sid",
+  "interval": "interval",
+  "endBuffer": "endBuffer",
+  "seat": "seat",
+  "seatRSid": "seatRSid",
+  "calendar": "calendar",
+  "calendarRSid": "calendarRSid"
+}
