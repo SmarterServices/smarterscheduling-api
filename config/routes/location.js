@@ -5,7 +5,7 @@ const locationSchema = require('./schema/location');
 const locationHandler = require('./../../lib/handlers/location');
 const utils = require('./../../lib/helpers/utils');
 
-module.exports = [{
+module.exports = [/*{
   method: 'POST',
   path: '/v1/accounts/{accountSid}/locations',
   config: {
@@ -136,4 +136,4 @@ module.exports = [{
       params: locationSchema.delete.params
     }
   }
-}];
+}*/];
