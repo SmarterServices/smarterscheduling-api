@@ -52,6 +52,7 @@
     "mocha": "^2.3.0",
     "nock": "^9.0.13",
     "mocha-generators": "^2.0.0",
+    "sinon": "^6.3.3",
     "ss-node-force": "git+https://65ed9f5031f63b7ed211e799138db3cb65e36ca7:x-oauth-basic@github.com/SmarterServices/node-force.git#node-force-module"
   }
 }

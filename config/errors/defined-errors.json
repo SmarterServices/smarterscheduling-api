@@ -24,5 +24,9 @@
   "ERROR_NOT_LISTED": {
     "code": "7000",
     "message": "Error Not Listed"
+  },
+  "DATABASE_ERROR": {
+    "code": "1201",
+    "message": "Database error occurred"
   }
 }

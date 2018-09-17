@@ -6,6 +6,7 @@ const server = require('./../base-server').server;
 const Request = require('./request');
 const request = new Request(server);
 const utils = require('./../lib/helpers/utils');
+const Populator = require('./populator');
 
 const dataPopulate = {
   addByEndpoint: function addByEndpoint(url, payload) {
@@ -54,7 +55,8 @@ const dataPopulate = {
     const query = `ALTER TABLE ${utils.tableWithSchema(tableName)} ALTER COLUMN isdeleted DROP NOT NULL`;
 
     return runQuery(query, {});
-  }
+  },
+  account: new Populator('sc_account__c', {}),
 };
 
 

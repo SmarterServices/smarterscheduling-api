@@ -298,6 +298,27 @@ const commonTools = {
     fieldsToCheck.forEach((field) => {
       expect(data[field]).to.eql(null);
     });
+  },
+
+  /**
+   * Compares Database error to the given response
+   * @param {Object} response - Response from Request
+   * @param {string} errorName - Name of the error
+   */
+  compareDatabaseError(response, errorName = 'DATABASE_ERROR') {
+    const errorMessage = errorResponse.ERROR_LIST[errorName].message;
+    let errorCode = 400;
+    let statusCode = 400;
+
+    if (errorName !== 'DATABASE_ERROR') {
+      errorCode = errorResponse.ERROR_LIST[errorName].code;
+      statusCode = errorResponse.ERROR_LIST[errorName].status || 400;
+    }
+
+    const result = response.result;
+    expect(response.statusCode).to.equal(errorCode);
+    expect(result.status).to.equal(statusCode);
+    expect(result.message).to.eql(errorMessage);
   }
 
 };
