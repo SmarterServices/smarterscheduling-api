@@ -6,7 +6,11 @@ const joi = require('joi');
 let schema = {
   add: {
     params: joi
-      .object({}),
+      .object({
+        accountSid: joi
+          .string()
+          .required()
+          .description('Account Sid')}),
     payload:joi.object({
      id: joi
       .string()
@@ -32,17 +36,29 @@ let schema = {
       .date()
       .required()
       .description('System Modstamp'),
+   schedulingAccount: joi
+      .string()
+      .required()
+      .description('Scheduling Account'),
+   schedulingAccountRSid: joi
+      .any()
+      .required()
+      .description('Scheduling Account R Sid'),
+   externalId: joi
+      .string()
+      .allow(null)
+      .description('External ID'),
    title: joi
       .string()
       .required()
       .description('Title'),
-   externalId: joi
+   seatManagement: joi
       .string()
-      .allow(null)
-      .description('External ID')
+      .required()
+      .description('Seat Management')
   })
   .required()
-  .description('Account payload')
+  .description('Location payload')
   },
   get: {
     params: joi
@@ -50,7 +66,12 @@ let schema = {
         accountSid: joi
           .string()
           .required()
-          .description('Account Sid')})
+          .description('Account Sid'),
+
+        locationSid: joi
+          .string()
+          .required()
+          .description('Location Sid')})
   },
   update: {
     params: joi
@@ -58,7 +79,12 @@ let schema = {
         accountSid: joi
           .string()
           .required()
-          .description('Account Sid')}),
+          .description('Account Sid'),
+
+        locationSid: joi
+          .string()
+          .required()
+          .description('Location Sid')}),
     payload: joi.object({
      id: joi
       .string()
@@ -84,17 +110,29 @@ let schema = {
       .date()
       .required()
       .description('System Modstamp'),
+   schedulingAccount: joi
+      .string()
+      .required()
+      .description('Scheduling Account'),
+   schedulingAccountRSid: joi
+      .any()
+      .required()
+      .description('Scheduling Account R Sid'),
+   externalId: joi
+      .string()
+      .allow(null)
+      .description('External ID'),
    title: joi
       .string()
       .required()
       .description('Title'),
-   externalId: joi
+   seatManagement: joi
       .string()
-      .allow(null)
-      .description('External ID')
+      .required()
+      .description('Seat Management')
   })
   .required()
-  .description('Account payload')
+  .description('Location payload')
   },
   delete: {
     params: joi
@@ -102,11 +140,20 @@ let schema = {
         accountSid: joi
           .string()
           .required()
-          .description('Account Sid')})
+          .description('Account Sid'),
+
+        locationSid: joi
+          .string()
+          .required()
+          .description('Location Sid')})
   },
   list: {
     params: joi
-      .object({}),
+      .object({
+        accountSid: joi
+          .string()
+          .required()
+          .description('Account Sid')}),
     query: {
       offset: joi
         .number()

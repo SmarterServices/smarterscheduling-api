@@ -5,7 +5,10 @@
   "createdDate": "createdDate",
   "lastModifiedDate": "lastModifiedDate",
   "systemModstamp": "systemModstamp",
+  "schedulingAccount": "schedulingAccount",
+  "schedulingAccountRSid": "schedulingAccountRSid",
   "sid": "sid",
+  "externalId": "externalId",
   "title": "title",
-  "externalId": "externalId"
+  "seatManagement": "seatManagement"
 }

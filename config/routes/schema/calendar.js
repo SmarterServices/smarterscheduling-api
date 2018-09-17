@@ -6,7 +6,16 @@ const joi = require('joi');
 let schema = {
   add: {
     params: joi
-      .object({}),
+      .object({
+        accountSid: joi
+          .string()
+          .required()
+          .description('Account Sid'),
+
+        locationSid: joi
+          .string()
+          .required()
+          .description('Location Sid')}),
     payload:joi.object({
      id: joi
       .string()
@@ -32,17 +41,21 @@ let schema = {
       .date()
       .required()
       .description('System Modstamp'),
+   schedulingLocation: joi
+      .string()
+      .required()
+      .description('Scheduling Location'),
+   schedulingLocationRSid: joi
+      .any()
+      .required()
+      .description('Scheduling Location R Sid'),
    title: joi
       .string()
       .required()
-      .description('Title'),
-   externalId: joi
-      .string()
-      .allow(null)
-      .description('External ID')
+      .description('Title')
   })
   .required()
-  .description('Account payload')
+  .description('Calendar payload')
   },
   get: {
     params: joi
@@ -50,7 +63,17 @@ let schema = {
         accountSid: joi
           .string()
           .required()
-          .description('Account Sid')})
+          .description('Account Sid'),
+
+        locationSid: joi
+          .string()
+          .required()
+          .description('Location Sid'),
+
+        calendarSid: joi
+          .string()
+          .required()
+          .description('Calendar Sid')})
   },
   update: {
     params: joi
@@ -58,7 +81,17 @@ let schema = {
         accountSid: joi
           .string()
           .required()
-          .description('Account Sid')}),
+          .description('Account Sid'),
+
+        locationSid: joi
+          .string()
+          .required()
+          .description('Location Sid'),
+
+        calendarSid: joi
+          .string()
+          .required()
+          .description('Calendar Sid')}),
     payload: joi.object({
      id: joi
       .string()
@@ -84,17 +117,21 @@ let schema = {
       .date()
       .required()
       .description('System Modstamp'),
+   schedulingLocation: joi
+      .string()
+      .required()
+      .description('Scheduling Location'),
+   schedulingLocationRSid: joi
+      .any()
+      .required()
+      .description('Scheduling Location R Sid'),
    title: joi
       .string()
       .required()
-      .description('Title'),
-   externalId: joi
-      .string()
-      .allow(null)
-      .description('External ID')
+      .description('Title')
   })
   .required()
-  .description('Account payload')
+  .description('Calendar payload')
   },
   delete: {
     params: joi
@@ -102,11 +139,30 @@ let schema = {
         accountSid: joi
           .string()
           .required()
-          .description('Account Sid')})
+          .description('Account Sid'),
+
+        locationSid: joi
+          .string()
+          .required()
+          .description('Location Sid'),
+
+        calendarSid: joi
+          .string()
+          .required()
+          .description('Calendar Sid')})
   },
   list: {
     params: joi
-      .object({}),
+      .object({
+        accountSid: joi
+          .string()
+          .required()
+          .description('Account Sid'),
+
+        locationSid: joi
+          .string()
+          .required()
+          .description('Location Sid')}),
     query: {
       offset: joi
         .number()

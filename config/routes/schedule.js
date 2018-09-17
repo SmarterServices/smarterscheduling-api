@@ -1,13 +1,13 @@
 'use strict';
 
-const accountSchema = require('./schema/account');
+const scheduleSchema = require('./schema/schedule');
 
-const accountHandler = require('./../../lib/handlers/account');
+const scheduleHandler = require('./../../lib/handlers/schedule');
 const utils = require('./../../lib/helpers/utils');
 
 module.exports = [/*{
   method: 'POST',
-  path: '/v1/accounts',
+  path: '/v1/accounts/{accountSid}/schedules',
   config: {
     handler: function (request, reply) {
 
@@ -16,24 +16,24 @@ module.exports = [/*{
         payload: request.payload
       };
 
-      accountHandler.addAccount(opts, function (err, r) {
+      scheduleHandler.addSchedule(opts, function (err, r) {
         if (err) {
           reply(Boom.badRequest(err));
         } else {
-          utils.replyJson('partials/account', {account: r}, reply);
+          utils.replyJson('partials/schedule', {schedule: r}, reply);
         }
       });
     },
-    tags: ['api', 'Account'],
-    description: 'Add account',
+    tags: ['api', 'Schedule'],
+    description: 'Add schedule',
     validate: {
-      params: accountSchema.add.params,
-      payload: accountSchema.add.payload
+      params: scheduleSchema.add.params,
+      payload: scheduleSchema.add.payload
     }
   }
 }, {
   method: 'GET',
-  path: '/v1/accounts',
+  path: '/v1/accounts/{accountSid}/schedules',
   config: {
     handler: function (request, reply) {
 
@@ -42,29 +42,29 @@ module.exports = [/*{
         query: Object.assign({}, request.query)
       };
 
-      accountHandler.listAccount(opts, function (err, r) {
+      scheduleHandler.listSchedule(opts, function (err, r) {
         if (err) {
           reply(Boom.badRequest(err));
         } else {
-          utils.replyJson('account-collection.js',
+          utils.replyJson('schedule-collection.js',
             {
-              account: r,
+              schedule: r,
               endpoint: utils.buildEndpointString(request),
               query: request.query
             }, reply);
         }
       });
     },
-    tags: ['api', 'Account'],
-    description: 'List account',
+    tags: ['api', 'Schedule'],
+    description: 'List schedule',
     validate: {
-      params: accountSchema.list.params,
-      query: accountSchema.list.query
+      params: scheduleSchema.list.params,
+      query: scheduleSchema.list.query
     }
   }
 }, {
   method: 'GET',
-  path: '/v1/accounts/{accountSid}',
+  path: '/v1/accounts/{accountSid}/schedules/{scheduleSid}',
   config: {
     handler: function (request, reply) {
 
@@ -72,23 +72,23 @@ module.exports = [/*{
         params: request.params
       };
 
-      accountHandler.getAccount(opts, function (err, r) {
+      scheduleHandler.getSchedule(opts, function (err, r) {
         if (err) {
           reply(Boom.badRequest(err));
         } else {
-          utils.replyJson('partials/account', {account: r}, reply);
+          utils.replyJson('partials/schedule', {schedule: r}, reply);
         }
       });
     },
-    tags: ['api', 'Account'],
-    description: 'Get account',
+    tags: ['api', 'Schedule'],
+    description: 'Get schedule',
     validate: {
-      params: accountSchema.get.params
+      params: scheduleSchema.get.params
     }
   }
 }, {
   method: 'PUT',
-  path: '/v1/accounts/{accountSid}',
+  path: '/v1/accounts/{accountSid}/schedules/{scheduleSid}',
   config: {
     handler: function (request, reply) {
 
@@ -97,24 +97,24 @@ module.exports = [/*{
         payload: request.payload
       };
 
-      accountHandler.updateAccount(opts, function (err, r) {
+      scheduleHandler.updateSchedule(opts, function (err, r) {
         if (err) {
           reply(Boom.badRequest(err));
         } else {
-          utils.replyJson('partials/account', {account: r}, reply);
+          utils.replyJson('partials/schedule', {schedule: r}, reply);
         }
       });
     },
-    tags: ['api', 'Account'],
-    description: 'Update account',
+    tags: ['api', 'Schedule'],
+    description: 'Update schedule',
     validate: {
-      params: accountSchema.update.params,
-      payload: accountSchema.update.payload
+      params: scheduleSchema.update.params,
+      payload: scheduleSchema.update.payload
     }
   }
 }, {
   method: 'DELETE',
-  path: '/v1/accounts/{accountSid}',
+  path: '/v1/accounts/{accountSid}/schedules/{scheduleSid}',
   config: {
     handler: function (request, reply) {
 
@@ -122,7 +122,7 @@ module.exports = [/*{
         params: request.params
       };
 
-      accountHandler.deleteAccount(opts, function (err, r) {
+      scheduleHandler.deleteSchedule(opts, function (err, r) {
         if (err) {
           reply(Boom.badRequest(err));
         } else {
@@ -130,10 +130,10 @@ module.exports = [/*{
         }
       });
     },
-    tags: ['api', 'Account'],
-    description: 'Delete account',
+    tags: ['api', 'Schedule'],
+    description: 'Delete schedule',
     validate: {
-      params: accountSchema.delete.params
+      params: scheduleSchema.delete.params
     }
   }
 }*/];

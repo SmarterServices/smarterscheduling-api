@@ -6,6 +6,10 @@
   "lastModifiedDate": "lastModifiedDate",
   "systemModstamp": "systemModstamp",
   "sid": "sid",
-  "title": "title",
-  "externalId": "externalId"
+  "interval": "interval",
+  "endBuffer": "endBuffer",
+  "seat": "seat",
+  "seatRSid": "seatRSid",
+  "calendar": "calendar",
+  "calendarRSid": "calendarRSid"
 }

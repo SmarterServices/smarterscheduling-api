@@ -6,6 +6,7 @@
   "lastModifiedDate": "lastModifiedDate",
   "systemModstamp": "systemModstamp",
   "sid": "sid",
-  "title": "title",
-  "externalId": "externalId"
+  "schedulingLocation": "schedulingLocation",
+  "schedulingLocationRSid": "schedulingLocationRSid",
+  "title": "title"
 }

@@ -6,7 +6,11 @@ const joi = require('joi');
 let schema = {
   add: {
     params: joi
-      .object({}),
+      .object({
+        accountSid: joi
+          .string()
+          .required()
+          .description('Account Sid')}),
     payload:joi.object({
      id: joi
       .string()
@@ -32,17 +36,33 @@ let schema = {
       .date()
       .required()
       .description('System Modstamp'),
-   title: joi
-      .string()
+   interval: joi
+      .number()
       .required()
-      .description('Title'),
-   externalId: joi
+      .description('Interval'),
+   endBuffer: joi
+      .number()
+      .required()
+      .description('End Buffer'),
+   seat: joi
       .string()
       .allow(null)
-      .description('External ID')
+      .description('Seat'),
+   seatRSid: joi
+      .any()
+      .required()
+      .description('Seat R Sid'),
+   calendar: joi
+      .string()
+      .allow(null)
+      .description('Calendar'),
+   calendarRSid: joi
+      .any()
+      .required()
+      .description('Calendar R Sid')
   })
   .required()
-  .description('Account payload')
+  .description('Schedule payload')
   },
   get: {
     params: joi
@@ -50,7 +70,12 @@ let schema = {
         accountSid: joi
           .string()
           .required()
-          .description('Account Sid')})
+          .description('Account Sid'),
+
+        scheduleSid: joi
+          .string()
+          .required()
+          .description('Schedule Sid')})
   },
   update: {
     params: joi
@@ -58,7 +83,12 @@ let schema = {
         accountSid: joi
           .string()
           .required()
-          .description('Account Sid')}),
+          .description('Account Sid'),
+
+        scheduleSid: joi
+          .string()
+          .required()
+          .description('Schedule Sid')}),
     payload: joi.object({
      id: joi
       .string()
@@ -84,17 +114,33 @@ let schema = {
       .date()
       .required()
       .description('System Modstamp'),
-   title: joi
-      .string()
+   interval: joi
+      .number()
       .required()
-      .description('Title'),
-   externalId: joi
+      .description('Interval'),
+   endBuffer: joi
+      .number()
+      .required()
+      .description('End Buffer'),
+   seat: joi
       .string()
       .allow(null)
-      .description('External ID')
+      .description('Seat'),
+   seatRSid: joi
+      .any()
+      .required()
+      .description('Seat R Sid'),
+   calendar: joi
+      .string()
+      .allow(null)
+      .description('Calendar'),
+   calendarRSid: joi
+      .any()
+      .required()
+      .description('Calendar R Sid')
   })
   .required()
-  .description('Account payload')
+  .description('Schedule payload')
   },
   delete: {
     params: joi
@@ -102,11 +148,20 @@ let schema = {
         accountSid: joi
           .string()
           .required()
-          .description('Account Sid')})
+          .description('Account Sid'),
+
+        scheduleSid: joi
+          .string()
+          .required()
+          .description('Schedule Sid')})
   },
   list: {
     params: joi
-      .object({}),
+      .object({
+        accountSid: joi
+          .string()
+          .required()
+          .description('Account Sid')}),
     query: {
       offset: joi
         .number()
