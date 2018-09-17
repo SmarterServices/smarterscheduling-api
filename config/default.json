@@ -1,4 +1,7 @@
 {
+  "rootApplication": {
+    "url": "http://localhost:8013"
+  },
   "databases": [
     {
       "dialect": "postgres",
@@ -32,5 +35,12 @@
     "connectionId": "8806cf52-d296-4aba-b8b1-bedd8c783907",
     "authorization": "Bearer a006440b-89d6-4111-af3a-dc7fa2658ad1",
     "port": 443
+  },
+  "serverSettings": {
+    "port": 8013,
+    "address": "127.0.0.1",
+    "routes": {
+      "cors": true
+    }
   }
 }
