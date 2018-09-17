@@ -1,0 +1,6 @@
+{
+  "account": {
+    "post": "v1/accounts",
+    "list": "v1/accounts"
+  }
+}

@@ -5,11 +5,13 @@
   "databases": [
     {
       "dialect": "postgres",
-      "host": "ec2-54-83-29-34.compute-1.amazonaws.com:5432",
+      "host": "ec2-54-83-29-34.compute-1.amazonaws.com",
       "databaseName": "d2ct4l1ls3t2sp",
       "userName": "jphdjspezhudpt",
       "password": "a8878d2d524e07cde908be40f29e59f0c015e77984e8937d3f5c296cb77c5451",
       "schema": "salesforce",
+      "operatorsAliases": false,
+      "ssl": true,
       "sortKey": "sid"
     }
   ],
