@@ -71,8 +71,6 @@ describe('Accounts', function testAccounts() {
 
     it('Should fail to add for database failure and return 400 response', function () {
       const payload = _.cloneDeep(accountData.post.payload.valid);
-
-
       const request = common.request.post(url).send(payload);
 
       return common
@@ -81,7 +79,6 @@ describe('Accounts', function testAccounts() {
           type: 'addData',
           name: 'account'
         });
-
     });
   });
 
