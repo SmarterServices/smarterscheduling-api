@@ -12,7 +12,7 @@
       "schema": "salesforce",
       "operatorsAliases": false,
       "ssl": true,
-      "sortKey": "sid",
+      "sortKey": "sid"
     }
   ],
   "logger": {
