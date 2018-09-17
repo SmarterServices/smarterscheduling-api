@@ -1,4 +1,3 @@
-
 'use strict';
 
 const joi = require('joi');
@@ -9,56 +8,26 @@ let schema = {
       .object({
         accountSid: joi
           .string()
+          .regex(/^SA[a-f0-9]{32}$/, 'accountSid')
           .required()
-          .description('Account Sid')}),
-    payload:joi.object({
-     id: joi
-      .string()
+          .description('Account Sid')
+      }),
+    payload: joi.object({
+      title: joi
+        .string()
+        .required()
+        .description('Title'),
+      externalId: joi
+        .string()
+        .allow(null)
+        .description('External ID'),
+      seatManagement: joi
+        .string()
+        .allow(null)
+        .description('Seat Management')
+    })
       .required()
-      .description('Id'),
-   isDeleted: joi
-      .boolean()
-      .required()
-      .description('Is Deleted'),
-   name: joi
-      .string()
-      .required()
-      .description('Name'),
-   createdDate: joi
-      .date()
-      .required()
-      .description('Created Date'),
-   lastModifiedDate: joi
-      .date()
-      .required()
-      .description('Last Modified Date'),
-   systemModstamp: joi
-      .date()
-      .required()
-      .description('System Modstamp'),
-   schedulingAccount: joi
-      .string()
-      .required()
-      .description('Scheduling Account'),
-   schedulingAccountRSid: joi
-      .any()
-      .required()
-      .description('Scheduling Account R Sid'),
-   externalId: joi
-      .string()
-      .allow(null)
-      .description('External ID'),
-   title: joi
-      .string()
-      .required()
-      .description('Title'),
-   seatManagement: joi
-      .string()
-      .required()
-      .description('Seat Management')
-  })
-  .required()
-  .description('Location payload')
+      .description('Location payload')
   },
   get: {
     params: joi
@@ -71,7 +40,8 @@ let schema = {
         locationSid: joi
           .string()
           .required()
-          .description('Location Sid')})
+          .description('Location Sid')
+      })
   },
   update: {
     params: joi
@@ -84,55 +54,56 @@ let schema = {
         locationSid: joi
           .string()
           .required()
-          .description('Location Sid')}),
+          .description('Location Sid')
+      }),
     payload: joi.object({
-     id: joi
-      .string()
+      id: joi
+        .string()
+        .required()
+        .description('Id'),
+      isDeleted: joi
+        .boolean()
+        .required()
+        .description('Is Deleted'),
+      name: joi
+        .string()
+        .required()
+        .description('Name'),
+      createdDate: joi
+        .date()
+        .required()
+        .description('Created Date'),
+      lastModifiedDate: joi
+        .date()
+        .required()
+        .description('Last Modified Date'),
+      systemModstamp: joi
+        .date()
+        .required()
+        .description('System Modstamp'),
+      schedulingAccount: joi
+        .string()
+        .required()
+        .description('Scheduling Account'),
+      schedulingAccountRSid: joi
+        .any()
+        .required()
+        .description('Scheduling Account R Sid'),
+      externalId: joi
+        .string()
+        .allow(null)
+        .description('External ID'),
+      title: joi
+        .string()
+        .required()
+        .description('Title'),
+      seatManagement: joi
+        .string()
+        .required()
+        .description('Seat Management')
+    })
       .required()
-      .description('Id'),
-   isDeleted: joi
-      .boolean()
-      .required()
-      .description('Is Deleted'),
-   name: joi
-      .string()
-      .required()
-      .description('Name'),
-   createdDate: joi
-      .date()
-      .required()
-      .description('Created Date'),
-   lastModifiedDate: joi
-      .date()
-      .required()
-      .description('Last Modified Date'),
-   systemModstamp: joi
-      .date()
-      .required()
-      .description('System Modstamp'),
-   schedulingAccount: joi
-      .string()
-      .required()
-      .description('Scheduling Account'),
-   schedulingAccountRSid: joi
-      .any()
-      .required()
-      .description('Scheduling Account R Sid'),
-   externalId: joi
-      .string()
-      .allow(null)
-      .description('External ID'),
-   title: joi
-      .string()
-      .required()
-      .description('Title'),
-   seatManagement: joi
-      .string()
-      .required()
-      .description('Seat Management')
-  })
-  .required()
-  .description('Location payload')
+      .description('Location payload')
   },
   delete: {
     params: joi
@@ -145,15 +116,18 @@ let schema = {
         locationSid: joi
           .string()
           .required()
-          .description('Location Sid')})
+          .description('Location Sid')
+      })
   },
   list: {
     params: joi
       .object({
         accountSid: joi
           .string()
+          .regex(/^SA[a-f0-9]{32}$/, 'accountSid')
           .required()
-          .description('Account Sid')}),
+          .description('Account Sid')
+      }),
     query: {
       offset: joi
         .number()
@@ -180,4 +154,3 @@ let schema = {
 };
 
 module.exports = schema;
-    

@@ -5,7 +5,7 @@ const locationSchema = require('./schema/location');
 const locationHandler = require('./../../lib/handlers/location');
 const utils = require('./../../lib/helpers/utils');
 
-module.exports = [/*{
+module.exports = [{
   method: 'POST',
   path: '/v1/accounts/{accountSid}/locations',
   config: {
@@ -29,6 +29,12 @@ module.exports = [/*{
     validate: {
       params: locationSchema.add.params,
       payload: locationSchema.add.payload
+    },
+    plugins: {
+      paramValidate: {
+        relationName: 'account',
+        primaryKey: 'accountSid'
+      }
     }
   }
 }, {
@@ -60,9 +66,15 @@ module.exports = [/*{
     validate: {
       params: locationSchema.list.params,
       query: locationSchema.list.query
+    },
+    plugins: {
+      paramValidate: {
+        relationName: 'account',
+        primaryKey: 'accountSid'
+      }
     }
   }
-}, {
+}/*, {
   method: 'GET',
   path: '/v1/accounts/{accountSid}/locations/{locationSid}',
   config: {
