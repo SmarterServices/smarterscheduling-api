@@ -1,0 +1,13 @@
+{
+  "id": "id",
+  "isDeleted": "isDeleted",
+  "name": "name",
+  "createdDate": "createdDate",
+  "lastModifiedDate": "lastModifiedDate",
+  "systemModstamp": "systemModstamp",
+  "sid": "sid",
+  "title": "title",
+  "description": "description",
+  "schedulingLocation": "schedulingLocation",
+  "schedulingLocationSid": "schedulingLocationSid"
+}
