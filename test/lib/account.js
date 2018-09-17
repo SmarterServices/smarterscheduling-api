@@ -89,4 +89,61 @@ describe('Accounts', function testAccounts() {
 
     });
   });
+
+  describe('LIST', function () {
+    const urlTemplate = endpoints.account.list;
+
+    it('Should list successfully and return 200 response', function () {
+
+      return common
+        .request
+        .get(urlTemplate)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(result.total).to.eql(accounts.length);
+          expect(result.count).to.eql(accounts.length);
+          expect(result.results).to.eql(accounts);
+        });
+
+    });
+
+    it('Should list filtered by [limit, offset] successfully and return 200 response', function () {
+      const limit = 1;
+      let offset = 1;
+      const url = common.buildUrl(urlTemplate, {}, {limit, offset});
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(result.total).to.eql(accounts.length);
+          expect(result.count).to.eql(limit);
+
+          for (const account of result.results) {
+            expect(account).to.eql(accounts[offset++]);
+          }
+        });
+
+    });
+
+    it('Should fail to list for database failure and return 400 response', function () {
+
+      const sequelizeMock = new SequelizeMock();
+      sequelizeMock.listData('account');
+
+
+      return common
+        .request
+        .get(urlTemplate)
+        .send()
+        .end()
+        .then(function (response) {
+          common.compareDatabaseError(response);
+          sequelizeMock.restore();
+        });
+
+    });
+  });
 });
