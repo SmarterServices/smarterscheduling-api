@@ -5,7 +5,6 @@ const assert = require('chai').assert;
 const accountData = require('./../data/account.json');
 const expect = require('chai').expect;
 const common = require('./../common');
-const SequelizeMock = require('./../mocks/sequelize');
 const endpoints = require('./../data/endpoints.json');
 
 describe('Accounts', function testAccounts() {
@@ -73,18 +72,14 @@ describe('Accounts', function testAccounts() {
     it('Should fail to add for database failure and return 400 response', function () {
       const payload = _.cloneDeep(accountData.post.payload.valid);
 
-      const sequelizeMock = new SequelizeMock();
-      sequelizeMock.addData('account');
 
+      const request = common.request.post(url).send(payload);
 
       return common
-        .request
-        .post(url)
-        .send(payload)
-        .end()
-        .then(function (response) {
-          common.compareDatabaseError(response);
-          sequelizeMock.restore();
+        .testDatabaseFailure({
+          request,
+          type: 'addData',
+          name: 'account'
         });
 
     });
@@ -129,19 +124,13 @@ describe('Accounts', function testAccounts() {
     });
 
     it('Should fail to list for database failure and return 400 response', function () {
-
-      const sequelizeMock = new SequelizeMock();
-      sequelizeMock.listData('account');
-
+      const request = common.request.get(urlTemplate);
 
       return common
-        .request
-        .get(urlTemplate)
-        .send()
-        .end()
-        .then(function (response) {
-          common.compareDatabaseError(response);
-          sequelizeMock.restore();
+        .testDatabaseFailure({
+          request,
+          type: 'listData',
+          name: 'account'
         });
 
     });
