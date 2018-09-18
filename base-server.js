@@ -16,6 +16,7 @@ try {
   const BodyParser = require('hapi-bodyparser');
   const paramValidatorPlugin = require('./plugin/validate-params');
   const utils = require('./lib/helpers/utils');
+  const sortKeyPlugin = require('./plugin/append-sort-key');
 
 
   // Injecting sequelize namespace
@@ -59,7 +60,8 @@ try {
   //For now we are only adding routes from these files only.
   const routes = [
     require('./config/routes'),
-    require('./config/routes/account')
+    require('./config/routes/account'),
+    require('./config/routes/location')
   ];
 
   // Inject failAction in each route
@@ -127,7 +129,8 @@ try {
     bodyParserPlugin,
     Vision,
     swaggerPlugin,
-    paramValidatorPlugin
+    paramValidatorPlugin,
+    sortKeyPlugin
   ];
 
   server.register(plugins, function () {

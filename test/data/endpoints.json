@@ -2,5 +2,9 @@
   "account": {
     "post": "v1/accounts",
     "list": "v1/accounts"
+  },
+  "location": {
+    "post": "v1/accounts/{accountSid}/locations",
+    "list": "v1/accounts/{accountSid}/locations"
   }
 }

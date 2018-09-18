@@ -5,7 +5,9 @@ const testPaths = {
     [
       './lib/account'
     ],
-    []
+    [
+      './lib/location'
+    ]
   ]
 };
 

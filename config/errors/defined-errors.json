@@ -28,5 +28,10 @@
   "DATABASE_ERROR": {
     "code": "1201",
     "message": "Database error occurred"
+  },
+  "ACCOUNT_NOT_FOUND": {
+    "code": "1202",
+    "message": "Account not found for '%schedulingAccountSid%'",
+    "status": 404
   }
 }
