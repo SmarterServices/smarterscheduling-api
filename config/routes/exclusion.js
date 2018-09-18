@@ -5,7 +5,7 @@ const exclusionSchema = require('./schema/exclusion');
 const exclusionHandler = require('./../../lib/handlers/exclusion');
 const utils = require('./../../lib/helpers/utils');
 
-module.exports = [/*{
+module.exports = [{
   method: 'POST',
   path: '/v1/accounts/{accountSid}/exclusions',
   config: {
@@ -18,7 +18,7 @@ module.exports = [/*{
 
       exclusionHandler.addExclusion(opts, function (err, r) {
         if (err) {
-          reply(Boom.badRequest(err));
+          errorResponse.formatError(err, null, reply);
         } else {
           utils.replyJson('partials/exclusion', {exclusion: r}, reply);
         }
@@ -31,7 +31,7 @@ module.exports = [/*{
       payload: exclusionSchema.add.payload
     }
   }
-}, {
+}/*, {
   method: 'GET',
   path: '/v1/accounts/{accountSid}/exclusions',
   config: {
@@ -44,7 +44,7 @@ module.exports = [/*{
 
       exclusionHandler.listExclusion(opts, function (err, r) {
         if (err) {
-          reply(Boom.badRequest(err));
+          errorResponse.formatError(err, null, reply);
         } else {
           utils.replyJson('exclusion-collection.js',
             {
@@ -74,7 +74,7 @@ module.exports = [/*{
 
       exclusionHandler.getExclusion(opts, function (err, r) {
         if (err) {
-          reply(Boom.badRequest(err));
+          errorResponse.formatError(err, null, reply);
         } else {
           utils.replyJson('partials/exclusion', {exclusion: r}, reply);
         }
@@ -99,7 +99,7 @@ module.exports = [/*{
 
       exclusionHandler.updateExclusion(opts, function (err, r) {
         if (err) {
-          reply(Boom.badRequest(err));
+          errorResponse.formatError(err, null, reply);
         } else {
           utils.replyJson('partials/exclusion', {exclusion: r}, reply);
         }
@@ -124,7 +124,7 @@ module.exports = [/*{
 
       exclusionHandler.deleteExclusion(opts, function (err, r) {
         if (err) {
-          reply(Boom.badRequest(err));
+          errorResponse.formatError(err, null, reply);
         } else {
           reply(r);
         }
