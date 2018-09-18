@@ -109,6 +109,7 @@ describe('Accounts', function testAccounts() {
         .get(url)
         .end()
         .then(function (response) {
+          common.verifyPagination(response);
           const result = response.result;
           expect(result.total).to.eql(accounts.length);
           expect(result.count).to.eql(limit);
