@@ -74,31 +74,34 @@ module.exports = [{
       }
     }
   }
-}/*, {
+}, {
   method: 'GET',
   path: '/v1/accounts/{accountSid}/exclusions/{exclusionSid}',
   config: {
     handler: function (request, reply) {
 
-      const opts = {
-        params: request.params
-      };
+      //We don't need to go to handler file as we are getting all the data in the route
+      const exclusion = request.paramValidationResult.exclusion;
 
-      exclusionHandler.getExclusion(opts, function (err, r) {
-        if (err) {
-          errorResponse.formatError(err, null, reply);
-        } else {
-          utils.replyJson('partials/exclusion', {exclusion: r}, reply);
-        }
-      });
+      utils.replyJson('partials/exclusion', {exclusion}, reply);
     },
     tags: ['api', 'Exclusion'],
     description: 'Get exclusion',
     validate: {
       params: exclusionSchema.get.params
+    },
+    plugins: {
+      paramValidate: {
+        relationName: 'exclusion',
+        primaryKey: 'exclusionSid',
+        parent: {
+          relationName: 'account',
+          primaryKey: 'accountSid'
+        }
+      }
     }
   }
-}, {
+}/*, {
   method: 'PUT',
   path: '/v1/accounts/{accountSid}/exclusions/{exclusionSid}',
   config: {
