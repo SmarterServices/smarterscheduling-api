@@ -7,5 +7,9 @@
         "seatManagement": "string"
       }
     }
+  },
+  "build": {
+    "title": "Test Title",
+    "seatManagement": "basic"
   }
 }

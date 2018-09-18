@@ -3,6 +3,9 @@
     "post": "v1/accounts",
     "list": "v1/accounts"
   },
+  "exclusion": {
+    "post": "v1/accounts/{accountSid}/exclusions"
+  },
   "location": {
     "post": "v1/accounts/{accountSid}/locations",
     "list": "v1/accounts/{accountSid}/locations"

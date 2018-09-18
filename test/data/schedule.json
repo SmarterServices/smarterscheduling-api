@@ -1,0 +1,9 @@
+{
+  "build": {
+    "name": "Test",
+    "interval": 10,
+    "endBuffer": 0,
+    "seatSid": "SE4ec86e8c18fc4eccb24665853a5867a6",
+    "calendarSid": "CL4ec86e8c18fc4eccb24665853a5867a6"
+  }
+}
