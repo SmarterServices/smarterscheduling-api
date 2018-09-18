@@ -149,7 +149,7 @@ describe('Exclusions', function testAccounts() {
       payload.locationSid = locationSid;
 
       //update location with a different account
-      yield common.populate.location.update({schedulingAccountSid: common.makeGenericSid('SA')},{sid: locationSid});
+      yield common.populate.location.update({schedulingAccountSid: common.makeGenericSid('SA')}, {sid: locationSid});
 
       yield common
         .request
@@ -161,7 +161,7 @@ describe('Exclusions', function testAccounts() {
         });
 
       //revert changes
-      yield common.populate.location.update({schedulingAccountSid: accountSid},{sid: locationSid});
+      yield common.populate.location.update({schedulingAccountSid: accountSid}, {sid: locationSid});
     });
 
     it('Should fail for invalid [scheduleSid] and return 404 response', function () {
@@ -258,6 +258,74 @@ describe('Exclusions', function testAccounts() {
         });
     });
   });
+
+  describe('GET Details', function () {
+    let exclusionSid;
+    const urlTemplate = endpoints.exclusion.get;
+
+    before('Init', () => {
+      exclusionSid = exclusions[0].sid;
+    });
+
+    it('Should get exclusion details for valid [accountSid] and [exclusionSid] with 200 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid, exclusionSid});
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+
+          expect(response.statusCode).to.equal(200);
+          expect(result).to.eql(exclusions[0]);
+        });
+
+    });
+
+
+    it('Should fail for invalid [exclusionSid] with 404 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid, exclusionSid: common.makeGenericSid('AE')});
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('EXCLUSION_NOT_FOUND_UNDER_ACCOUNT', response);
+        });
+
+    });
+
+
+    it('Should fail for invalid [accountSid] with 404 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid: common.makeGenericSid('SA'), exclusionSid});
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('ACCOUNT_NOT_FOUND', response);
+        });
+
+    });
+
+
+    it('Should fail for different [accountSid] with 404 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid: accountSid2, exclusionSid});
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('EXCLUSION_NOT_FOUND_UNDER_ACCOUNT', response);
+        });
+
+    });
+  });
+
 
   describe('LIST', function () {
     const urlTemplate = endpoints.exclusion.list;
