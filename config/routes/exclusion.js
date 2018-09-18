@@ -29,6 +29,12 @@ module.exports = [{
     validate: {
       params: exclusionSchema.add.params,
       payload: exclusionSchema.add.payload
+    },
+    plugins: {
+      paramValidate: {
+        relationName: 'account',
+        primaryKey: 'accountSid'
+      }
     }
   }
 }/*, {

@@ -25,13 +25,28 @@
     "code": "7000",
     "message": "Error Not Listed"
   },
+  "DATA_NOT_FOUND": {
+    "code": "1200",
+    "message": "Data not found",
+    "status": 404
+  },
   "DATABASE_ERROR": {
     "code": "1201",
     "message": "Database error occurred"
   },
   "ACCOUNT_NOT_FOUND": {
     "code": "1202",
-    "message": "Account not found for '%schedulingAccountSid%'",
+    "message": "Account '%schedulingAccountSid%' not found",
+    "status": 404
+  },
+  "LOCATION_NOT_FOUND": {
+    "code": "1203",
+    "message": "Location '%locationSid%' not found",
+    "status": 404
+  },
+  "SCHEDULE_NOT_FOUND": {
+    "code": "1204",
+    "message": "Schedule '%scheduleSid%' not found",
     "status": 404
   }
 }
