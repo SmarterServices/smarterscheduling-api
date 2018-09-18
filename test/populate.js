@@ -8,6 +8,9 @@ const request = new Request(server);
 const utils = require('./../lib/helpers/utils');
 const Populator = require('./populator');
 
+//Require all the data needed for populate
+const accountData = require('./data/account');
+
 const dataPopulate = {
   addByEndpoint: function addByEndpoint(url, payload) {
     return request
@@ -56,7 +59,8 @@ const dataPopulate = {
 
     return runQuery(query, {});
   },
-  account: new Populator('sc_account__c', {}),
+  account: new Populator('sc_account__c', accountData.post.payload.valid),
+  location: new Populator('sc_location__c', {})
 };
 
 

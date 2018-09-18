@@ -244,7 +244,7 @@ const createSchema = function createSchema() {
     const config = require('config');
     const randomStringGenerator = require('randomstring');
     const randomSchemaConfig = {length: 10, capitalization: 'lowercase'};
-    const schemaPrefix = 'sp_v2_unit_test_';
+    const schemaPrefix = 'sc_unit_test_';
     const schemaName = schemaPrefix + randomStringGenerator.generate(randomSchemaConfig);
     config.databases[0].schema = schemaName;
 
