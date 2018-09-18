@@ -141,9 +141,12 @@ let schema = {
         .description('Number of items to return'),
       sortKeys: joi
         .array()
-        .items(joi.string())
+        .items(joi
+          .string()
+          .valid('createdDate')
+        )
         .single()
-        .default([])
+        .default(['createdDate'])
         .description('Keys to sort the data'),
       sortOrder: joi
         .string()
