@@ -18,7 +18,7 @@ module.exports = [{
 
       locationHandler.addLocation(opts, function (err, r) {
         if (err) {
-          reply(err);
+          errorResponse.formatError(err, null, reply);
         } else {
           utils.replyJson('partials/location', {location: r}, reply);
         }
@@ -29,6 +29,12 @@ module.exports = [{
     validate: {
       params: locationSchema.add.params,
       payload: locationSchema.add.payload
+    },
+    plugins: {
+      paramValidate: {
+        relationName: 'account',
+        primaryKey: 'accountSid'
+      }
     }
   }
 }, {
@@ -44,7 +50,7 @@ module.exports = [{
 
       locationHandler.listLocation(opts, function (err, r) {
         if (err) {
-          reply(err);
+          errorResponse.formatError(err, null, reply);
         } else {
           utils.replyJson('location-collection.js',
             {
@@ -60,9 +66,15 @@ module.exports = [{
     validate: {
       params: locationSchema.list.params,
       query: locationSchema.list.query
+    },
+    plugins: {
+      paramValidate: {
+        relationName: 'account',
+        primaryKey: 'accountSid'
+      }
     }
   }
-}, {
+}/*, {
   method: 'GET',
   path: '/v1/accounts/{accountSid}/locations/{locationSid}',
   config: {
@@ -136,4 +148,4 @@ module.exports = [{
       params: locationSchema.delete.params
     }
   }
-}];
+}*/];

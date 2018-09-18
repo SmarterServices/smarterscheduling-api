@@ -1,0 +1,11 @@
+{
+  "post": {
+    "payload": {
+      "valid": {
+        "title": "string",
+        "externalId": "string",
+        "seatManagement": "string"
+      }
+    }
+  }
+}
