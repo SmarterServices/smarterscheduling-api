@@ -48,5 +48,10 @@
     "code": "1204",
     "message": "Schedule '%scheduleSid%' not found",
     "status": 404
+  },
+  "EXCLUSION_NOT_FOUND_UNDER_ACCOUNT": {
+    "code": "1205",
+    "message": "Exclusion '%exclusionSid%' not found under '%schedulingAccountSid%'",
+    "status": 404
   }
 }
