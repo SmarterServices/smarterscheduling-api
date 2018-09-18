@@ -207,10 +207,19 @@ const schema = {
       .object({
         accountSid: joi
           .string()
+          .regex(/^SA[a-f0-9]{32}$/, 'Account Sid')
           .required()
           .description('Account Sid')
       }),
     query: {
+      locationSid: joi
+        .string()
+        .regex(/^SL[a-f0-9]{32}$/)
+        .description('Scheduling Location Sid'),
+      scheduleSid: joi
+        .string()
+        .regex(/^SC[a-f0-9]{32}$/)
+        .description('Schedule Sid'),
       offset: joi
         .number()
         .integer()
@@ -223,13 +232,17 @@ const schema = {
         .description('Number of items to return'),
       sortKeys: joi
         .array()
-        .items(joi.string())
+        .items(joi
+          .string()
+          .valid('createdDate')
+        )
         .single()
-        .default([])
+        .default(['createdDate'])
         .description('Keys to sort the data'),
       sortOrder: joi
         .string()
         .valid('ASC', 'DESC')
+        .default('ASC')
         .description('Sort order')
     }
   }
