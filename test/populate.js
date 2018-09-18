@@ -10,6 +10,8 @@ const Populator = require('./populator');
 
 //Require all the data needed for populate
 const accountData = require('./data/account');
+const locationData = require('./data/location');
+const scheduleData = require('./data/schedule');
 
 const dataPopulate = {
   addByEndpoint: function addByEndpoint(url, payload) {
@@ -60,7 +62,9 @@ const dataPopulate = {
     return runQuery(query, {});
   },
   account: new Populator('sc_account__c', accountData.post.payload.valid),
-  location: new Populator('sc_location__c', {})
+  exclusion: new Populator('sc_availability_exclusion__c', {}),
+  location: new Populator('sc_location__c', locationData.build),
+  schedule: new Populator('sc_schedule__c', scheduleData.build)
 };
 
 
