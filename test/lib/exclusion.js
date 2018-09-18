@@ -9,6 +9,7 @@ const endpoints = require('./../data/endpoints.json');
 
 describe('Exclusions', function testAccounts() {
   let accountSid;
+  let accountSid2;
   let locationSid;
   let scheduleSid;
   const exclusions = [];
@@ -16,6 +17,7 @@ describe('Exclusions', function testAccounts() {
   before('PopulateData', function* () {
 
     accountSid = (yield common.populate.account.addDefault()).sid;
+    accountSid2 = (yield common.populate.account.addDefault()).sid;
     locationSid = (yield common.populate.location.addDefault({schedulingAccountSid: accountSid})).sid;
 
     const schedule = yield common.populate.schedule.addDefault({});
@@ -254,6 +256,122 @@ describe('Exclusions', function testAccounts() {
           type: 'getData',
           name: 'schedule'
         });
+    });
+  });
+
+  describe('LIST', function () {
+    const urlTemplate = endpoints.exclusion.list;
+
+    it('Should list successfully and return 200 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid});
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(response.statusCode).to.eql(200);
+          expect(result.total).to.eql(exclusions.length);
+          expect(result.count).to.eql(exclusions.length);
+          expect(result.results).to.eql(exclusions);
+        });
+    });
+
+    it('Should list filtered by [limit, offset]  and return 200 response', function () {
+      const limit = 1;
+      let offset = 1;
+      const url = common.buildUrl(urlTemplate, {accountSid}, {limit, offset});
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.verifyPagination(response);
+          const result = response.result;
+          expect(result.total).to.eql(exclusions.length);
+          expect(result.count).to.eql(limit);
+
+          for (const exclusion of result.results) {
+            expect(exclusion).to.eql(exclusions[offset++]);
+          }
+        });
+    });
+
+    it('Should list filtered by [locationSid] and return 200 response', function () {
+      const locationFilteredExclusion = exclusions.filter((exclusion) => exclusion.locationSid === locationSid);
+
+      const url = common.buildUrl(urlTemplate, {accountSid}, {locationSid});
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(response.statusCode).to.eql(200);
+          expect(result.total).to.eql(locationFilteredExclusion.length);
+          expect(result.count).to.eql(locationFilteredExclusion.length);
+          expect(result.results).to.eql(locationFilteredExclusion);
+        });
+    });
+
+    it('Should list filtered by [scheduleSid] and return 200 response', function () {
+      const scheduleFilteredExclusion = exclusions.filter((exclusion) => exclusion.scheduleSid === scheduleSid);
+
+      const url = common.buildUrl(urlTemplate, {accountSid}, {scheduleSid});
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(response.statusCode).to.eql(200);
+          expect(result.total).to.eql(scheduleFilteredExclusion.length);
+          expect(result.count).to.eql(scheduleFilteredExclusion.length);
+          expect(result.results).to.eql(scheduleFilteredExclusion);
+        });
+    });
+
+    it('Should list zero row for different [accountSid] and return 200 response', function () {
+      const url = common.buildUrl(urlTemplate, {
+        accountSid: accountSid2
+      });
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(response.statusCode).to.eql(200);
+          expect(result.total).to.eql(0);
+          expect(result.count).to.eql(0);
+          expect(result.results).to.eql([]);
+        });
+    });
+
+    it('Should fail for invalid [accountSid] and return 404 response', function () {
+      const url = common.buildUrl(urlTemplate, {
+        accountSid: common.makeGenericSid('SA')
+      });
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('ACCOUNT_NOT_FOUND', response);
+        });
+    });
+
+    it('Should fail to list for database failure and return 400 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid});
+      const request = common.request.get(url);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'listData',
+          name: 'exclusion'
+        });
+
     });
   });
 });
