@@ -14,7 +14,7 @@ const fs = require('fs');
 const config = require('config');
 const randomStringGenerator = require('randomstring');
 const randomSchemaConfig = {length: 10, capitalization: 'lowercase'};
-const schemaPrefix = 'sp_v2_unit_test_';
+const schemaPrefix = 'scheduling_unit_test_';
 const randomSchema = schemaPrefix + randomStringGenerator.generate(randomSchemaConfig);
 require('mocha-generators').install();
 // update test database schema

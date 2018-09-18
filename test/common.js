@@ -18,6 +18,7 @@ const pify = require('pify');
 const nock = require('nock');
 const templateHelpers = require('./../lib/helpers/template-helpers');
 const JsonMapper = require('./../lib/helpers/json-mapper');
+const SequelizeMock = require('./mocks/sequelize');
 
 const commonTools = {
   /**
@@ -298,8 +299,70 @@ const commonTools = {
     fieldsToCheck.forEach((field) => {
       expect(data[field]).to.eql(null);
     });
-  }
+  },
 
+  /**
+   * Compares Database error to the given response
+   * @param {Object} response - Response from Request
+   * @param {string} errorName - Name of the error
+   */
+  compareDatabaseError(response, errorName = 'DATABASE_ERROR') {
+    const errorMessage = errorResponse.ERROR_LIST[errorName].message;
+    let errorCode = 400;
+    let statusCode = 400;
+
+    if (errorName !== 'DATABASE_ERROR') {
+      errorCode = errorResponse.ERROR_LIST[errorName].code;
+      statusCode = errorResponse.ERROR_LIST[errorName].status || 400;
+    }
+
+    const result = response.result;
+    expect(response.statusCode).to.equal(errorCode);
+    expect(result.status).to.equal(statusCode);
+    expect(result.message).to.eql(errorMessage);
+  },
+
+  /**
+   * Request and verifies response for database failure test
+   * @param {Object} data - Data Required for test
+   * @param {string} data.type - Type of sequelize action to mock
+   * @param {string} data.name - Name of model or raw query
+   * @param {string} data.request - Actual request to call
+   * @param {string} data.fileNamePattern - Pattern of the file name when type is rawQuery
+   * @returns {Promise} - Response of the test
+   */
+  testDatabaseFailure(data) {
+    const _this = this;
+    const {type, name, request, fileNamePattern} = data;
+    const sequelizeMock = new SequelizeMock();
+
+    switch (type) {
+      case 'addData':
+        sequelizeMock.addData(name);
+        break;
+      case 'listData':
+        sequelizeMock.listData(name);
+        break;
+      case 'getData':
+        sequelizeMock.getData(name);
+        break;
+      case 'deleteData':
+        sequelizeMock.deleteData(name);
+        break;
+      case 'rawQuery':
+        sequelizeMock.mockQueryWithStackTrace(name, fileNamePattern);
+        break;
+      default:
+        return Promise.reject('Type mismatched');
+    }
+
+    return request
+      .end()
+      .then(function (response) {
+        _this.compareDatabaseError(response);
+        sequelizeMock.restore();
+      });
+  }
 };
 
 module.exports = commonTools;

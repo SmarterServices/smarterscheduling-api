@@ -3,7 +3,7 @@
 const testPaths = {
   filePaths: [
     [
-      './lib/handler'
+      './lib/account'
     ],
     []
   ]
