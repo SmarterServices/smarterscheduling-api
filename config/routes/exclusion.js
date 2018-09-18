@@ -37,7 +37,7 @@ module.exports = [{
       }
     }
   }
-}/*, {
+}, {
   method: 'GET',
   path: '/v1/accounts/{accountSid}/exclusions',
   config: {
@@ -66,9 +66,15 @@ module.exports = [{
     validate: {
       params: exclusionSchema.list.params,
       query: exclusionSchema.list.query
+    },
+    plugins: {
+      paramValidate: {
+        relationName: 'account',
+        primaryKey: 'accountSid'
+      }
     }
   }
-}, {
+}/*, {
   method: 'GET',
   path: '/v1/accounts/{accountSid}/exclusions/{exclusionSid}',
   config: {
