@@ -58,7 +58,8 @@ try {
 
   //For now we are only adding routes from these files only.
   const routes = [
-    require('./config/routes')
+    require('./config/routes'),
+    require('./config/routes/account')
   ];
 
   // Inject failAction in each route

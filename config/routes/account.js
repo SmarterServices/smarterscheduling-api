@@ -5,20 +5,19 @@ const accountSchema = require('./schema/account');
 const accountHandler = require('./../../lib/handlers/account');
 const utils = require('./../../lib/helpers/utils');
 
-module.exports = [/*{
+module.exports = [{
   method: 'POST',
   path: '/v1/accounts',
   config: {
     handler: function (request, reply) {
 
       const opts = {
-        params: request.params,
         payload: request.payload
       };
 
       accountHandler.addAccount(opts, function (err, r) {
         if (err) {
-          reply(Boom.badRequest(err));
+          errorResponse.formatError(err, null, reply);
         } else {
           utils.replyJson('partials/account', {account: r}, reply);
         }
@@ -27,7 +26,6 @@ module.exports = [/*{
     tags: ['api', 'Account'],
     description: 'Add account',
     validate: {
-      params: accountSchema.add.params,
       payload: accountSchema.add.payload
     }
   }
@@ -38,13 +36,12 @@ module.exports = [/*{
     handler: function (request, reply) {
 
       const opts = {
-        params: request.params,
         query: Object.assign({}, request.query)
       };
 
       accountHandler.listAccount(opts, function (err, r) {
         if (err) {
-          reply(Boom.badRequest(err));
+          errorResponse.formatError(err, null, reply);
         } else {
           utils.replyJson('account-collection.js',
             {
@@ -58,11 +55,10 @@ module.exports = [/*{
     tags: ['api', 'Account'],
     description: 'List account',
     validate: {
-      params: accountSchema.list.params,
       query: accountSchema.list.query
     }
   }
-}, {
+}/*, {
   method: 'GET',
   path: '/v1/accounts/{accountSid}',
   config: {
