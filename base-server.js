@@ -16,6 +16,7 @@ try {
   const BodyParser = require('hapi-bodyparser');
   const paramValidatorPlugin = require('./plugin/validate-params');
   const utils = require('./lib/helpers/utils');
+  const sortKeyPlugin = require('./plugin/append-sort-key');
 
 
   // Injecting sequelize namespace
@@ -129,7 +130,8 @@ try {
     bodyParserPlugin,
     Vision,
     swaggerPlugin,
-    paramValidatorPlugin
+    paramValidatorPlugin,
+    sortKeyPlugin
   ];
 
   server.register(plugins, function () {
