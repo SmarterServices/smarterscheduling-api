@@ -9,6 +9,7 @@ const endpoints = require('./../data/endpoints.json');
 describe('Locations', function testAccounts() {
   let accountSid;
   let accountSid1;
+  const externalId = common.makeGenericSid('ex');
   const locations = [];
 
   before('PopulateData', function* () {
@@ -69,9 +70,9 @@ describe('Locations', function testAccounts() {
 
     });
 
-
-    it('Should successfully add location with same [externalId] and return 200 response', function () {
+    it('Should successfully add location with different [externalId] and return 200 response', function () {
       const payload = _.cloneDeep(locationData.post.payload.valid);
+      payload.externalId = externalId;
 
       return common
         .request
@@ -139,7 +140,6 @@ describe('Locations', function testAccounts() {
 
     });
 
-
     it('Should return empty response for different [accountSid] with 200 response', function () {
       const url = common.buildUrl(urlTemplate, {accountSid: accountSid1});
 
@@ -155,6 +155,21 @@ describe('Locations', function testAccounts() {
 
     });
 
+    it('Should filter by [externalId] and return successfully with 200 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid}, {externalId});
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(result.total).to.eql(1);
+          expect(result.count).to.eql(1);
+          expect(result.results[0].externalId).to.eql(externalId);
+        });
+
+    });
 
     it('Should fail for invalid [accountSid] and return 404 response', function () {
       const url = common.buildUrl(urlTemplate, {accountSid: common.makeGenericSid('SA')});

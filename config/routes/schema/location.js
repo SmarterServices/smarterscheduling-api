@@ -19,10 +19,13 @@ let schema = {
         .description('Title'),
       externalId: joi
         .string()
+        .max(255)
         .allow(null)
         .description('External ID'),
       seatManagement: joi
         .string()
+        .valid('basic', 'advanced')
+        .default('basic')
         .allow(null)
         .description('Seat Management')
     })
@@ -129,6 +132,9 @@ let schema = {
           .description('Account Sid')
       }),
     query: {
+      externalId: joi
+        .string()
+        .description('External id to filter the data by'),
       offset: joi
         .number()
         .integer()
@@ -146,7 +152,6 @@ let schema = {
           .valid('createdDate')
         )
         .single()
-        .default(['createdDate'])
         .description('Keys to sort the data'),
       sortOrder: joi
         .string()
