@@ -18,7 +18,7 @@ module.exports = [{
 
       locationHandler.addLocation(opts, function (err, r) {
         if (err) {
-          reply(err);
+          errorResponse.formatError(err, null, reply);
         } else {
           utils.replyJson('partials/location', {location: r}, reply);
         }
@@ -50,7 +50,7 @@ module.exports = [{
 
       locationHandler.listLocation(opts, function (err, r) {
         if (err) {
-          reply(err);
+          errorResponse.formatError(err, null, reply);
         } else {
           utils.replyJson('location-collection.js',
             {
