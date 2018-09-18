@@ -178,10 +178,12 @@ const schema = {
         .description('Recurring'),
       externalSystem: joi
         .string()
+        .max(255)
         .allow(null)
         .description('External System'),
       externalId: joi
         .string()
+        .max(255)
         .allow(null)
         .description('External ID')
     })
