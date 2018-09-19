@@ -442,6 +442,120 @@ describe('Exclusions', function testAccounts() {
 
     });
   });
+
+
+  describe('Update', function () {
+    let exclusionSid;
+    const urlTemplate = endpoints.exclusion.update;
+
+    before('Init', () => {
+      exclusionSid = exclusions[0].sid;
+    });
+
+    it('Should update exclusion details for valid [accountSid] and [exclusionSid] with 200 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid, exclusionSid});
+      const payload = _.cloneDeep(exclusionData.update.payload.valid);
+      const fieldsToIgnore = ['editDate'];
+
+      return common
+        .request
+        .put(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          const updatePayload = Object.assign({}, exclusions[0], payload);
+
+          expect(response.statusCode).to.equal(200);
+          expect(_.omit(result, fieldsToIgnore)).to.eql(_.omit(updatePayload, fieldsToIgnore));
+        });
+
+    });
+
+
+    it('Should fail for invalid [exclusionSid] with 404 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid, exclusionSid: common.makeGenericSid('AE')});
+      const payload = _.cloneDeep(exclusionData.update.payload.valid);
+
+      return common
+        .request
+        .put(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('EXCLUSION_NOT_FOUND_UNDER_ACCOUNT', response);
+        });
+
+    });
+
+
+    it('Should fail for invalid [accountSid] with 404 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid: common.makeGenericSid('SA'), exclusionSid});
+      const payload = _.cloneDeep(exclusionData.update.payload.valid);
+
+      return common
+        .request
+        .put(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('ACCOUNT_NOT_FOUND', response);
+        });
+
+    });
+
+
+    it('Should fail for different [accountSid] with 404 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid: accountSid2, exclusionSid});
+      const payload = _.cloneDeep(exclusionData.update.payload.valid);
+
+      return common
+        .request
+        .put(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('EXCLUSION_NOT_FOUND_UNDER_ACCOUNT', response);
+        });
+
+    });
+
+
+    it('Should fail for database failure of [add exclusion] and return 400 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid, exclusionSid});
+      const payload = _.cloneDeep(exclusionData.update.payload.valid);
+      const request = common
+        .request
+        .put(url)
+        .send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'updateData',
+          name: 'exclusion'
+        });
+
+    });
+
+
+    it('Should fail for database failure of [get exclusion] and return 400 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid, exclusionSid});
+      const payload = _.cloneDeep(exclusionData.update.payload.valid);
+      const request = common
+        .request
+        .put(url)
+        .send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'getData',
+          name: 'exclusion'
+        });
+
+    });
+  });
 });
 
 /**
