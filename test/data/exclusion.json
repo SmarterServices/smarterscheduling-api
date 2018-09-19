@@ -1,0 +1,19 @@
+{
+  "post": {
+    "payload": {
+      "valid": {
+        "locationSid": null,
+        "scheduleSid": null,
+        "title": "Test Title",
+        "startDate": "2100-09-18",
+        "endDate": "2100-09-18",
+        "dayOfWeek": 2,
+        "startTime": "13:49",
+        "endTime": "22:49",
+        "recurring": "weekly",
+        "externalId": "abc123",
+        "externalSystem": "Office365"
+      }
+    }
+  }
+}
