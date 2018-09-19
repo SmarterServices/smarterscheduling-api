@@ -352,6 +352,9 @@ const commonTools = {
       case 'updateData':
         sequelizeMock.updateData(name);
         break;
+      case 'bulkCreate':
+        sequelizeMock.bulkCreate(name);
+        break;
       case 'rawQuery':
         sequelizeMock.mockQueryWithStackTrace(name, fileNamePattern);
         break;

@@ -1,8 +1,8 @@
 'use strict';
 
-const calenderSeatSchema = require('./schema/calender-seat');
+const calendarSeatSchema = require('./schema/calendar-seat');
 
-const calenderSeatHandler = require('./../../lib/handlers/calender-seat');
+const calendarSeatHandler = require('./../../lib/handlers/calendar-seat');
 const utils = require('./../../lib/helpers/utils');
 
 module.exports = [/*{
@@ -16,19 +16,19 @@ module.exports = [/*{
         payload: request.payload
       };
 
-      calenderSeatHandler.addCalenderSeat(opts, function (err, r) {
+      calendarSeatHandler.addcalendarSeat(opts, function (err, r) {
         if (err) {
           reply(Boom.badRequest(err));
         } else {
-          utils.replyJson('partials/calender-seat', {calenderSeat: r}, reply);
+          utils.replyJson('partials/calendar-seat', {calendarSeat: r}, reply);
         }
       });
     },
-    tags: ['api', 'Calender Seat'],
-    description: 'Add calenderSeat',
+    tags: ['api', 'calendar Seat'],
+    description: 'Add calendarSeat',
     validate: {
-      params: calenderSeatSchema.add.params,
-      payload: calenderSeatSchema.add.payload
+      params: calendarSeatSchema.add.params,
+      payload: calendarSeatSchema.add.payload
     }
   }
 }, {
@@ -42,29 +42,29 @@ module.exports = [/*{
         query: Object.assign({}, request.query)
       };
 
-      calenderSeatHandler.listCalenderSeat(opts, function (err, r) {
+      calendarSeatHandler.listcalendarSeat(opts, function (err, r) {
         if (err) {
           reply(Boom.badRequest(err));
         } else {
-          utils.replyJson('calender-seat-collection.js',
+          utils.replyJson('calendar-seat-collection.js',
             {
-              calenderSeat: r,
+              calendarSeat: r,
               endpoint: utils.buildEndpointString(request),
               query: request.query
             }, reply);
         }
       });
     },
-    tags: ['api', 'Calender Seat'],
-    description: 'List calenderSeat',
+    tags: ['api', 'calendar Seat'],
+    description: 'List calendarSeat',
     validate: {
-      params: calenderSeatSchema.list.params,
-      query: calenderSeatSchema.list.query
+      params: calendarSeatSchema.list.params,
+      query: calendarSeatSchema.list.query
     }
   }
 }, {
   method: 'GET',
-  path: '/v1/accounts/{accountSid}/locations/{locationSid}/calendars/{calendarSid}/seats/{calenderSeatSid}',
+  path: '/v1/accounts/{accountSid}/locations/{locationSid}/calendars/{calendarSid}/seats/{calendarSeatSid}',
   config: {
     handler: function (request, reply) {
 
@@ -72,23 +72,23 @@ module.exports = [/*{
         params: request.params
       };
 
-      calenderSeatHandler.getCalenderSeat(opts, function (err, r) {
+      calendarSeatHandler.getcalendarSeat(opts, function (err, r) {
         if (err) {
           reply(Boom.badRequest(err));
         } else {
-          utils.replyJson('partials/calender-seat', {calenderSeat: r}, reply);
+          utils.replyJson('partials/calendar-seat', {calendarSeat: r}, reply);
         }
       });
     },
-    tags: ['api', 'Calender Seat'],
-    description: 'Get calenderSeat',
+    tags: ['api', 'calendar Seat'],
+    description: 'Get calendarSeat',
     validate: {
-      params: calenderSeatSchema.get.params
+      params: calendarSeatSchema.get.params
     }
   }
 }, {
   method: 'PUT',
-  path: '/v1/accounts/{accountSid}/locations/{locationSid}/calendars/{calendarSid}/seats/{calenderSeatSid}',
+  path: '/v1/accounts/{accountSid}/locations/{locationSid}/calendars/{calendarSid}/seats/{calendarSeatSid}',
   config: {
     handler: function (request, reply) {
 
@@ -97,24 +97,24 @@ module.exports = [/*{
         payload: request.payload
       };
 
-      calenderSeatHandler.updateCalenderSeat(opts, function (err, r) {
+      calendarSeatHandler.updatecalendarSeat(opts, function (err, r) {
         if (err) {
           reply(Boom.badRequest(err));
         } else {
-          utils.replyJson('partials/calender-seat', {calenderSeat: r}, reply);
+          utils.replyJson('partials/calendar-seat', {calendarSeat: r}, reply);
         }
       });
     },
-    tags: ['api', 'Calender Seat'],
-    description: 'Update calenderSeat',
+    tags: ['api', 'calendar Seat'],
+    description: 'Update calendarSeat',
     validate: {
-      params: calenderSeatSchema.update.params,
-      payload: calenderSeatSchema.update.payload
+      params: calendarSeatSchema.update.params,
+      payload: calendarSeatSchema.update.payload
     }
   }
 }, {
   method: 'DELETE',
-  path: '/v1/accounts/{accountSid}/locations/{locationSid}/calendars/{calendarSid}/seats/{calenderSeatSid}',
+  path: '/v1/accounts/{accountSid}/locations/{locationSid}/calendars/{calendarSid}/seats/{calendarSeatSid}',
   config: {
     handler: function (request, reply) {
 
@@ -122,7 +122,7 @@ module.exports = [/*{
         params: request.params
       };
 
-      calenderSeatHandler.deleteCalenderSeat(opts, function (err, r) {
+      calendarSeatHandler.deletecalendarSeat(opts, function (err, r) {
         if (err) {
           reply(Boom.badRequest(err));
         } else {
@@ -130,10 +130,10 @@ module.exports = [/*{
         }
       });
     },
-    tags: ['api', 'Calender Seat'],
-    description: 'Delete calenderSeat',
+    tags: ['api', 'calendar Seat'],
+    description: 'Delete calendarSeat',
     validate: {
-      params: calenderSeatSchema.delete.params
+      params: calendarSeatSchema.delete.params
     }
   }
 }*/];
