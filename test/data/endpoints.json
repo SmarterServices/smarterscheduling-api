@@ -3,6 +3,9 @@
     "post": "v1/accounts",
     "list": "v1/accounts"
   },
+  "calendar": {
+    "post": "v1/accounts/{accountSid}/locations/{locationSid}/calendars"
+  },
   "exclusion": {
     "post": "v1/accounts/{accountSid}/exclusions",
     "get": "v1/accounts/{accountSid}/exclusions/{exclusionSid}",

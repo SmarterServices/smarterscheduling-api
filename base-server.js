@@ -61,6 +61,7 @@ try {
   const routes = [
     require('./config/routes'),
     require('./config/routes/account'),
+    require('./config/routes/calendar'),
     require('./config/routes/exclusion'),
     require('./config/routes/location')
   ];

@@ -25,33 +25,48 @@
     "code": "7000",
     "message": "Error Not Listed"
   },
+  "UNAUTHORIZED": {
+    "code": "5000",
+    "message": "You are unauthorized to access or perform this action on this resource.",
+    "status": 401
+  },
   "DATA_NOT_FOUND": {
     "code": "1200",
     "message": "Data not found",
     "status": 404
   },
   "DATABASE_ERROR": {
-    "code": "1201",
+    "code": "1208",
     "message": "Database error occurred"
   },
   "ACCOUNT_NOT_FOUND": {
-    "code": "1202",
-    "message": "Account '%schedulingAccountSid%' not found",
-    "status": 404
+    "code": "1201",
+    "message": "Account not found for '%schedulingAccountSid%'",
+    "status": "404"
   },
   "LOCATION_NOT_FOUND": {
-    "code": "1203",
+    "code": "1202",
     "message": "Location '%locationSid%' not found",
     "status": 404
   },
   "SCHEDULE_NOT_FOUND": {
-    "code": "1204",
+    "code": "1203",
     "message": "Schedule '%scheduleSid%' not found",
     "status": 404
   },
   "EXCLUSION_NOT_FOUND_UNDER_ACCOUNT": {
-    "code": "1205",
+    "code": "1204",
     "message": "Exclusion '%exclusionSid%' not found under '%schedulingAccountSid%'",
     "status": 404
+  },
+  "LOCATION_NOT_FOUND_UNDER_ACCOUNT": {
+    "code": "1205",
+    "message": "Location '%locationSid%' not found under Account '%schedulingAccountSid%'",
+    "status": "404"
+  },
+  "NUMBER_OF_SEATS_REQUIRED": {
+    "code": "1206",
+    "message": "Number of seats field is required",
+    "status": 400
   }
 }

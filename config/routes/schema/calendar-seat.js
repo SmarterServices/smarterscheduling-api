@@ -64,7 +64,7 @@ let schema = {
       .description('Seat R Sid')
   })
   .required()
-  .description('Calender Seat payload')
+  .description('Calendar Seat payload')
   },
   get: {
     params: joi
@@ -84,10 +84,10 @@ let schema = {
           .required()
           .description('Calendar Sid'),
 
-        calenderSeatSid: joi
+        calendarSeatSid: joi
           .string()
           .required()
-          .description('Calender Seat Sid')})
+          .description('Calendar Seat Sid')})
   },
   update: {
     params: joi
@@ -107,10 +107,10 @@ let schema = {
           .required()
           .description('Calendar Sid'),
 
-        calenderSeatSid: joi
+        calendarSeatSid: joi
           .string()
           .required()
-          .description('Calender Seat Sid')}),
+          .description('calendar Seat Sid')}),
     payload: joi.object({
      id: joi
       .string()
@@ -154,7 +154,7 @@ let schema = {
       .description('Seat R Sid')
   })
   .required()
-  .description('Calender Seat payload')
+  .description('calendar Seat payload')
   },
   delete: {
     params: joi
@@ -174,10 +174,10 @@ let schema = {
           .required()
           .description('Calendar Sid'),
 
-        calenderSeatSid: joi
+        calendarSeatSid: joi
           .string()
           .required()
-          .description('Calender Seat Sid')})
+          .description('calendar Seat Sid')})
   },
   list: {
     params: joi
@@ -222,4 +222,3 @@ let schema = {
 };
 
 module.exports = schema;
-    

@@ -5,7 +5,7 @@ const calendarSchema = require('./schema/calendar');
 const calendarHandler = require('./../../lib/handlers/calendar');
 const utils = require('./../../lib/helpers/utils');
 
-module.exports = [/*{
+module.exports = [{
   method: 'POST',
   path: '/v1/accounts/{accountSid}/locations/{locationSid}/calendars',
   config: {
@@ -13,12 +13,13 @@ module.exports = [/*{
 
       const opts = {
         params: request.params,
-        payload: request.payload
+        payload: request.payload,
+        paramValidationResult: request.paramValidationResult
       };
 
       calendarHandler.addCalendar(opts, function (err, r) {
         if (err) {
-          reply(Boom.badRequest(err));
+          errorResponse.formatError(err, null, reply);
         } else {
           utils.replyJson('partials/calendar', {calendar: r}, reply);
         }
@@ -29,9 +30,19 @@ module.exports = [/*{
     validate: {
       params: calendarSchema.add.params,
       payload: calendarSchema.add.payload
+    },
+    plugins: {
+      paramValidate: {
+        relationName: 'location',
+        primaryKey: 'locationSid',
+        parent: {
+          relationName: 'account',
+          primaryKey: 'accountSid'
+        }
+      }
     }
   }
-}, {
+}, /*{
   method: 'GET',
   path: '/v1/accounts/{accountSid}/locations/{locationSid}/calendars',
   config: {
