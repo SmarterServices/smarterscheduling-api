@@ -6,6 +6,9 @@ const expect = require('chai').expect;
 const common = require('./../common');
 const endpoints = require('./../data/endpoints.json');
 const sinon = require('sinon');
+const scheduleService = require('./../../lib/services/schedule');
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 
 describe('Calendar', function testCalendar() {
   const calendars = [];
@@ -60,6 +63,9 @@ describe('Calendar', function testCalendar() {
       payload.interval = 2;
       payload.endBuffer = 4;
 
+      sandbox = sinon.sandbox.create();
+      const scheduleSpy = sandbox.spy(scheduleService, 'addSchedule');
+
       return common
         .request
         .post(url)
@@ -77,18 +83,23 @@ describe('Calendar', function testCalendar() {
         })
         .then((data) => {
           expect(data.length).to.equal(payload.numberOfSeats);
-          const promises = [];
-          for(const calendarSeat of data) {
-            promises.push(common.populate.seat.list({sid: calendarSeat.seatSid}));
-          }
-          return Promise.all(promises);
+
+          return common.populate.seat.list({
+            sid: {
+              [Op.in]: data.map(seat => seat.sid)
+            }
+          });
         })
         .then((data) => {
           // Iterating all the seats to check they have the required locationSid
-          for(const seat of data) {
+          for (const seat of data) {
             expect(seat[0].schedulingLocationSid).to.equal(locationSid);
             expect(seat[0].title).to.not.equal(undefined);
           }
+          return scheduleSpy.returnValues[0];
+        })
+        .then((data) => {
+          expect(data.seatSid).to.equal(null);
         });
     });
 
