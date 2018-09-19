@@ -42,7 +42,7 @@
   "ACCOUNT_NOT_FOUND": {
     "code": "1201",
     "message": "Account not found for '%schedulingAccountSid%'",
-    "status": "404"
+    "status": 404
   },
   "LOCATION_NOT_FOUND": {
     "code": "1202",
@@ -62,11 +62,10 @@
   "LOCATION_NOT_FOUND_UNDER_ACCOUNT": {
     "code": "1205",
     "message": "Location '%locationSid%' not found under Account '%schedulingAccountSid%'",
-    "status": "404"
+    "status": 404
   },
   "NUMBER_OF_SEATS_REQUIRED": {
     "code": "1206",
-    "message": "Number of seats field is required",
-    "status": 400
+    "message": "Number of seats field is required"
   }
 }

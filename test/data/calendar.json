@@ -1,10 +1,10 @@
 {
   "post": {
-  "payload": {
-    "valid": {
-      "title": "Demo Calendar",
-      "numberOfSeats": 2
+    "payload": {
+      "valid": {
+        "title": "Demo Calendar",
+        "numberOfSeats": 2
+      }
     }
   }
-}
 }

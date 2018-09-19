@@ -9,12 +9,17 @@ const sinon = require('sinon');
 
 describe('Calendar', function testCalendar() {
   const calendars = [];
-  let accountSid
+  let accountSid;
+  let locationSid;
   let sandbox;
 
   before('Populate Data', function* () {
     const account = yield common.populate.account.addDefault();
-    const location = yield common.populate
+    accountSid = account.sid;
+    const location = yield common.populate.location.addDefault({
+      schedulingAccountSid: accountSid
+    });
+    locationSid = location.sid;
   });
 
   after('Clean Data', function* () {
@@ -26,13 +31,11 @@ describe('Calendar', function testCalendar() {
 
   describe('POST', function () {
     const urlTemplate = endpoints.calendar.post;
-    const omittedField = ['sid', 'editDate', 'createdDate'];
 
-    it('Should Add calendar along with [seat], [schedule] and [calendar-seat] and return 200 response', function () {
+    it('Should Add calendar successfully and return 200 response', function () {
       const payload = _.cloneDeep(calendarData.post.payload.valid);
-      const url = common.buildUrl(urlTemplate, {});
-
-      sandbox = sinon.sandbox.create();
+      const params = {accountSid, locationSid};
+      const url = common.buildUrl(urlTemplate, params);
 
       return common
         .request
@@ -41,10 +44,9 @@ describe('Calendar', function testCalendar() {
         .end()
         .then(function (response) {
           const result = response.result;
+          expect(response.statusCode).to.equal(200);
+          expect(result.title).to.equal(payload.title);
           calendars.push(result);
-
-
-          sandbox.restore();
         });
 
     });
