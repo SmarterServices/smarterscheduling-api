@@ -101,7 +101,7 @@ module.exports = [{
       }
     }
   }
-}/*, {
+}, {
   method: 'PUT',
   path: '/v1/accounts/{accountSid}/exclusions/{exclusionSid}',
   config: {
@@ -125,9 +125,15 @@ module.exports = [{
     validate: {
       params: exclusionSchema.update.params,
       payload: exclusionSchema.update.payload
+    },
+    plugins: {
+      paramValidate: {
+        relationName: 'account',
+        primaryKey: 'accountSid'
+      }
     }
   }
-}, {
+}/*, {
   method: 'DELETE',
   path: '/v1/accounts/{accountSid}/exclusions/{exclusionSid}',
   config: {
