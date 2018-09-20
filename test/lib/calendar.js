@@ -14,6 +14,7 @@ describe('Calendar', function testCalendar() {
   const calendars = [];
   let accountSid;
   let locationSid;
+  let locationSid2;
   let sandbox;
 
   before('Populate Data', function* () {
@@ -22,6 +23,9 @@ describe('Calendar', function testCalendar() {
     const location = yield common.populate.location.addDefault({
       schedulingAccountSid: accountSid
     });
+    locationSid2 = (yield common.populate.location.addDefault({
+      schedulingAccountSid: accountSid
+    })).sid;
     locationSid = location.sid;
   });
 
@@ -270,6 +274,133 @@ describe('Calendar', function testCalendar() {
       expect(numberOfCalendersBefore).to.equal(numberOfCalendersAfter);
       expect(numberOfSeatsBefore).to.equal(numberOfSeatsafter);
       expect(numberOfCalenderSeatsBefore).to.equal(numberOfCalenderSeatsAfter);
+    });
+  });
+
+  describe('LIST', function () {
+    const urlTemplate = endpoints.calendar.list;
+
+    it('Should List calendar successfully and return 200 response', function () {
+      const params = {accountSid, locationSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(result.total).to.eql(calendars.length);
+          expect(result.count).to.eql(calendars.length);
+          expect(result.results).to.eql(calendars);
+          expect(response.statusCode).to.equal(200);
+        });
+    });
+
+    it('Should List empty calendar for different [locationSid] and return 200 response', function () {
+      const params = {accountSid, locationSid: locationSid2};
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(response.statusCode).to.equal(200);
+          expect(result.count).to.equal(0);
+        });
+    });
+
+    it('Should list filtered by [limit, offset] successfully and return 200 response', function () {
+      const limit = 1;
+      let offset = 1;
+      const params = {accountSid, locationSid};
+      const url = common.buildUrl(urlTemplate, params, {limit, offset});
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.verifyPagination(response);
+          const result = response.result;
+          expect(result.total).to.eql(calendars.length);
+          expect(result.count).to.eql(limit);
+
+          for (const calendar of result.results) {
+            expect(calendar).to.eql(calendars [offset++]);
+          }
+        });
+
+    });
+
+    it('Should fail to list for invalid [accountSid] and return 400 response', function () {
+      const params = {
+        accountSid: common.makeGenericSid('SA'),
+        locationSid
+      };
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('ACCOUNT_NOT_FOUND', response);
+        });
+    });
+
+    it('Should fail to list for invalid [locationSid] and return 400 response', function () {
+      const params = {
+        accountSid,
+        locationSid: common.makeGenericSid('SL')
+      };
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('LOCATION_NOT_FOUND_UNDER_ACCOUNT', response);
+        });
+    });
+
+    it('Should fail for [locationSid] under different [accountSid] and return 404 response', function* () {
+      const params = {
+        accountSid,
+        locationSid
+      };
+      const url = common.buildUrl(urlTemplate, params);
+
+      //update location with a different account
+      yield common.populate.location.update({schedulingAccountSid: common.makeGenericSid('SA')}, {sid: locationSid});
+
+      yield common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('LOCATION_NOT_FOUND_UNDER_ACCOUNT', response);
+        });
+
+      //revert changes
+      yield common.populate.location.update({schedulingAccountSid: accountSid}, {sid: locationSid});
+    });
+
+    it('Should fail to list for database failure of [listCalender] and return 400 response', function () {
+      const params = {accountSid, locationSid};
+      const url = common.buildUrl(urlTemplate, params);
+      const request = common.request.get(url);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'rawQuery',
+          name: 'listCalendar',
+          fileNamePattern: /.*services[\\\/]calendar\.js/
+        });
     });
   });
 

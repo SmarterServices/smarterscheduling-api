@@ -146,11 +146,13 @@ const schema = {
       .object({
         accountSid: joi
           .string()
+          .regex(/^SA[a-f0-9]{32}$/, 'Account Sid')
           .required()
           .description('Account Sid'),
 
         locationSid: joi
           .string()
+          .regex(/^SL[a-f0-9]{32}$/, 'Location Sid')
           .required()
           .description('Location Sid')}),
     query: {
@@ -166,13 +168,17 @@ const schema = {
         .description('Number of items to return'),
       sortKeys: joi
         .array()
-        .items(joi.string())
         .single()
-        .default([])
+        .items(joi
+          .string()
+          .valid('createdDate')
+        )
+        .default(['createdDate'])
         .description('Keys to sort the data'),
       sortOrder: joi
         .string()
         .valid('ASC', 'DESC')
+        .default('ASC')
         .description('Sort order')
     }
   }
