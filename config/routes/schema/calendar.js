@@ -51,16 +51,17 @@ const schema = {
       .object({
         accountSid: joi
           .string()
+          .regex(/^SA[a-f0-9]{32}$/, 'Account Sid')
           .required()
           .description('Account Sid'),
-
         locationSid: joi
           .string()
+          .regex(/^SL[a-f0-9]{32}$/, 'Location Sid')
           .required()
           .description('Location Sid'),
-
         calendarSid: joi
           .string()
+          .regex(/^CL[a-f0-9]{32}$/, 'Calendar Sid')
           .required()
           .description('Calendar Sid')})
   },

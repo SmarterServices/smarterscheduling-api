@@ -83,19 +83,20 @@ module.exports = [{
       }
     }
   }
-}, /*{
+}, {
   method: 'GET',
   path: '/v1/accounts/{accountSid}/locations/{locationSid}/calendars/{calendarSid}',
   config: {
     handler: function (request, reply) {
 
       const opts = {
-        params: request.params
+        params: request.params,
+        paramValidationResult: request.paramValidationResult
       };
 
       calendarHandler.getCalendar(opts, function (err, r) {
         if (err) {
-          reply(Boom.badRequest(err));
+          errorResponse.formatError(err, null, reply);
         } else {
           utils.replyJson('partials/calendar', {calendar: r}, reply);
         }
@@ -105,9 +106,22 @@ module.exports = [{
     description: 'Get calendar',
     validate: {
       params: calendarSchema.get.params
+    },
+    plugins: {
+      paramValidate: {
+        relationName: 'calendar',
+        primaryKey: 'calendarSid',
+        ancestor: [{
+          relationName: 'location',
+          primaryKey: 'locationSid'
+        }, {
+          relationName: 'account',
+          primaryKey: 'accountSid'
+        }]
+      }
     }
   }
-}, {
+}, /*{
   method: 'PUT',
   path: '/v1/accounts/{accountSid}/locations/{locationSid}/calendars/{calendarSid}',
   config: {
