@@ -21,10 +21,10 @@ try {
 
   // Injecting sequelize namespace
   // This will trigger transactional queries
-  // const cls = require('continuation-local-storage');
-  // const namespace = cls.createNamespace(appConfig.databases[0].namespace);
-  // const Sequelize = require('sequelize');
-  // Sequelize.useCLS(namespace);
+  const cls = require('continuation-local-storage');
+  const namespace = cls.createNamespace(appConfig.databases[0].namespace);
+  const Sequelize = require('sequelize');
+  Sequelize.useCLS(namespace);
 
   // turn of node event emitter limit
   process.setMaxListeners(0);
