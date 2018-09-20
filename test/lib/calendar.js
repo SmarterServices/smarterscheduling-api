@@ -63,7 +63,7 @@ describe('Calendar', function testCalendar() {
       payload.interval = 2;
       payload.endBuffer = 4;
 
-      sandbox = sinon.sandbox.create();
+      sandbox = sinon.createSandbox();
       const scheduleSpy = sandbox.spy(scheduleService, 'addSchedule');
 
       return common
@@ -270,6 +270,184 @@ describe('Calendar', function testCalendar() {
       expect(numberOfCalendersBefore).to.equal(numberOfCalendersAfter);
       expect(numberOfSeatsBefore).to.equal(numberOfSeatsafter);
       expect(numberOfCalenderSeatsBefore).to.equal(numberOfCalenderSeatsAfter);
+    });
+  });
+
+  describe('GET', function () {
+    const urlTemplate = endpoints.calendar.get;
+
+    it('Should get calendar successfully and return 200 response', function () {
+      const calendarSid = calendars[0].sid;
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(response.statusCode).to.eql(200);
+          expect(result).to.eql(calendars[0]);
+        });
+    });
+
+    it('Should get calendar with [seat] successfully and return 200 response', function () {
+      const calendarWithSeat = calendars.find((calendar) => calendar.numberOfSeats > 0);
+
+      const calendarSid = calendarWithSeat.sid;
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(response.statusCode).to.eql(200);
+          expect(result).to.eql(calendarWithSeat);
+        });
+    });
+
+    it('Should get calendar without [seat] successfully and return 200 response', function () {
+      const calendarWithoutSeat = calendars.find((calendar) => calendar.numberOfSeats === 0);
+
+      const calendarSid = calendarWithoutSeat.sid;
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(response.statusCode).to.eql(200);
+          expect(result).to.eql(calendarWithoutSeat);
+        });
+    });
+
+    it('Should fail for invalid [accountSid] and return 404 response', function () {
+      const calendarSid = calendars[0].sid;
+      const params = {
+        locationSid,
+        calendarSid,
+        accountSid: common.makeGenericSid('SA')
+      };
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('ACCOUNT_NOT_FOUND', response);
+        });
+    });
+
+    it('Should fail for invalid [locationSid] and return 404 response', function () {
+      const calendarSid = calendars[0].sid;
+      const params = {
+        accountSid,
+        calendarSid,
+        locationSid: common.makeGenericSid('SL')
+      };
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('LOCATION_NOT_FOUND_UNDER_ACCOUNT', response);
+        });
+    });
+
+    it('Should fail for [locationSid] under different [accountSid] and return 404 response', function* () {
+      const calendarSid = calendars[0].sid;
+      const params = {accountSid, calendarSid, locationSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      //update location with a different account
+      yield common.populate.location.update({schedulingAccountSid: common.makeGenericSid('SA')}, {sid: locationSid});
+
+      yield common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('LOCATION_NOT_FOUND_UNDER_ACCOUNT', response);
+        });
+
+      //revert changes
+      yield common.populate.location.update({schedulingAccountSid: accountSid}, {sid: locationSid});
+    });
+
+    it('Should fail for invalid [calendarSid] and return 404 response', function () {
+      const params = {
+        accountSid,
+        locationSid,
+        calendarSid: common.makeGenericSid('CL')
+      };
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('CALENDAR_NOT_FOUND_UNDER_LOCATION', response);
+        });
+    });
+
+    it('Should fail for [calendarSid] under different [locationSid] and return 404 response', function* () {
+      const calendar = calendars[0];
+      const calendarSid = calendars[0].sid;
+      const params = {accountSid, calendarSid, locationSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      //update calendar with a different location
+      yield common.populate.calendar.update({schedulingLocationSid: common.makeGenericSid('SL')}, {sid: calendarSid});
+
+      yield common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('CALENDAR_NOT_FOUND_UNDER_LOCATION', response);
+        });
+
+      //revert changes
+      yield common.populate.calendar.update({schedulingLocationSid: calendar.locationSid}, {sid: calendarSid});
+    });
+
+    it('Should fail for database failure of [get schedule] and return 400 response', function () {
+      const calendarSid = calendars[0].sid;
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+      const request = common.request.get(url);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'getData',
+          name: 'schedule'
+        });
+    });
+
+    it('Should fail for database failure of [list calendarSeat] and return 400 response', function () {
+      const calendarSid = calendars[0].sid;
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+      const request = common.request.get(url);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'listData',
+          name: 'calendar-seat'
+        });
     });
   });
 });
