@@ -4,7 +4,8 @@
     "list": "v1/accounts"
   },
   "calendar": {
-    "post": "v1/accounts/{accountSid}/locations/{locationSid}/calendars"
+    "post": "v1/accounts/{accountSid}/locations/{locationSid}/calendars",
+    "list": "v1/accounts/{accountSid}/locations/{locationSid}/calendars"
   },
   "exclusion": {
     "post": "v1/accounts/{accountSid}/exclusions",

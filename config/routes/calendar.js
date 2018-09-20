@@ -42,7 +42,7 @@ module.exports = [{
       }
     }
   }
-}, /*{
+}, {
   method: 'GET',
   path: '/v1/accounts/{accountSid}/locations/{locationSid}/calendars',
   config: {
@@ -55,7 +55,7 @@ module.exports = [{
 
       calendarHandler.listCalendar(opts, function (err, r) {
         if (err) {
-          reply(Boom.badRequest(err));
+          errorResponse.formatError(err, null, reply);
         } else {
           utils.replyJson('calendar-collection.js',
             {
@@ -71,9 +71,19 @@ module.exports = [{
     validate: {
       params: calendarSchema.list.params,
       query: calendarSchema.list.query
+    },
+    plugins: {
+      paramValidate: {
+        relationName: 'location',
+        primaryKey: 'locationSid',
+        parent: {
+          relationName: 'account',
+          primaryKey: 'accountSid'
+        }
+      }
     }
   }
-}, {
+}, /*{
   method: 'GET',
   path: '/v1/accounts/{accountSid}/locations/{locationSid}/calendars/{calendarSid}',
   config: {
