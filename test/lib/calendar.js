@@ -197,7 +197,7 @@ describe('Calendar', function testCalendar() {
         });
     });
 
-    it('Should fail for database failure of [seat bulkCreate] and return 400 response', function () {
+    it('Should fail for database failure of [seat bulkCreate] and return 400 response', function* () {
       const payload = _.cloneDeep(calendarData.post.payload.valid);
       const params = {
         accountSid,
@@ -206,12 +206,17 @@ describe('Calendar', function testCalendar() {
       const url = common.buildUrl(urlTemplate, params);
       const request = common.request.post(url).send(payload);
 
-      return common
+      const numberOfCalendersBefore = (yield common.populate.calendar.list({schedulingLocationSid: locationSid})).length;
+
+      yield common
         .testDatabaseFailure({
           request,
           type: 'bulkCreate',
           name: 'seat'
         });
+
+      const numberOfCalendersAfter = (yield common.populate.calendar.list({schedulingLocationSid: locationSid})).length;
+      expect(numberOfCalendersBefore).to.equal(numberOfCalendersAfter);
     });
 
     it('Should fail for database failure of [calendar-seat bulkCreate] and return 400 response', function () {
