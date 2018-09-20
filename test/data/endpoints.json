@@ -11,7 +11,8 @@
     "post": "v1/accounts/{accountSid}/exclusions",
     "get": "v1/accounts/{accountSid}/exclusions/{exclusionSid}",
     "update": "v1/accounts/{accountSid}/exclusions/{exclusionSid}",
-    "list": "v1/accounts/{accountSid}/exclusions"
+    "list": "v1/accounts/{accountSid}/exclusions",
+    "delete": "v1/accounts/{accountSid}/exclusions/{exclusionSid}"
   },
   "location": {
     "post": "v1/accounts/{accountSid}/locations",
