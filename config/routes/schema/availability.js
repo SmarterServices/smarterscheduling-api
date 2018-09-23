@@ -1,9 +1,8 @@
-
 'use strict';
 
 const joi = require('joi');
 
-let schema = {
+const schema = {
   add: {
     params: joi
       .object({
@@ -15,67 +14,68 @@ let schema = {
         scheduleSid: joi
           .string()
           .required()
-          .description('Schedule Sid')}),
-    payload:joi.object({
-     id: joi
-      .string()
+          .description('Schedule Sid')
+      }),
+    payload: joi.object({
+      id: joi
+        .string()
+        .required()
+        .description('Id'),
+      isDeleted: joi
+        .boolean()
+        .required()
+        .description('Is Deleted'),
+      name: joi
+        .string()
+        .required()
+        .description('Name'),
+      createdDate: joi
+        .date()
+        .required()
+        .description('Created Date'),
+      lastModifiedDate: joi
+        .date()
+        .required()
+        .description('Last Modified Date'),
+      systemModstamp: joi
+        .date()
+        .required()
+        .description('System Modstamp'),
+      schedule: joi
+        .string()
+        .required()
+        .description('Schedule'),
+      scheduleRSid: joi
+        .any()
+        .required()
+        .description('Schedule R Sid'),
+      startDate: joi
+        .date()
+        .allow(null)
+        .description('Start Date'),
+      endDate: joi
+        .date()
+        .allow(null)
+        .description('End Date'),
+      dayOfWeek: joi
+        .number()
+        .required()
+        .description('Day Of Week'),
+      startTime: joi
+        .any()
+        .required()
+        .description('Start Time'),
+      endTime: joi
+        .any()
+        .required()
+        .description('End Time'),
+      recurring: joi
+        .string()
+        .allow(null)
+        .description('Recurring')
+    })
       .required()
-      .description('Id'),
-   isDeleted: joi
-      .boolean()
-      .required()
-      .description('Is Deleted'),
-   name: joi
-      .string()
-      .required()
-      .description('Name'),
-   createdDate: joi
-      .date()
-      .required()
-      .description('Created Date'),
-   lastModifiedDate: joi
-      .date()
-      .required()
-      .description('Last Modified Date'),
-   systemModstamp: joi
-      .date()
-      .required()
-      .description('System Modstamp'),
-   schedule: joi
-      .string()
-      .required()
-      .description('Schedule'),
-   scheduleRSid: joi
-      .any()
-      .required()
-      .description('Schedule R Sid'),
-   startDate: joi
-      .date()
-      .allow(null)
-      .description('Start Date'),
-   endDate: joi
-      .date()
-      .allow(null)
-      .description('End Date'),
-   dayOfWeek: joi
-      .number()
-      .required()
-      .description('Day Of Week'),
-   startTime: joi
-      .any()
-      .required()
-      .description('Start Time'),
-   endTime: joi
-      .any()
-      .required()
-      .description('End Time'),
-   recurring: joi
-      .string()
-      .allow(null)
-      .description('Recurring')
-  })
-  .required()
-  .description('Availability payload')
+      .description('Availability payload')
   },
   get: {
     params: joi
@@ -93,7 +93,8 @@ let schema = {
         availabilitySid: joi
           .string()
           .required()
-          .description('Availability Sid')})
+          .description('Availability Sid')
+      })
   },
   update: {
     params: joi
@@ -111,67 +112,68 @@ let schema = {
         availabilitySid: joi
           .string()
           .required()
-          .description('Availability Sid')}),
+          .description('Availability Sid')
+      }),
     payload: joi.object({
-     id: joi
-      .string()
+      id: joi
+        .string()
+        .required()
+        .description('Id'),
+      isDeleted: joi
+        .boolean()
+        .required()
+        .description('Is Deleted'),
+      name: joi
+        .string()
+        .required()
+        .description('Name'),
+      createdDate: joi
+        .date()
+        .required()
+        .description('Created Date'),
+      lastModifiedDate: joi
+        .date()
+        .required()
+        .description('Last Modified Date'),
+      systemModstamp: joi
+        .date()
+        .required()
+        .description('System Modstamp'),
+      schedule: joi
+        .string()
+        .required()
+        .description('Schedule'),
+      scheduleRSid: joi
+        .any()
+        .required()
+        .description('Schedule R Sid'),
+      startDate: joi
+        .date()
+        .allow(null)
+        .description('Start Date'),
+      endDate: joi
+        .date()
+        .allow(null)
+        .description('End Date'),
+      dayOfWeek: joi
+        .number()
+        .required()
+        .description('Day Of Week'),
+      startTime: joi
+        .any()
+        .required()
+        .description('Start Time'),
+      endTime: joi
+        .any()
+        .required()
+        .description('End Time'),
+      recurring: joi
+        .string()
+        .allow(null)
+        .description('Recurring')
+    })
       .required()
-      .description('Id'),
-   isDeleted: joi
-      .boolean()
-      .required()
-      .description('Is Deleted'),
-   name: joi
-      .string()
-      .required()
-      .description('Name'),
-   createdDate: joi
-      .date()
-      .required()
-      .description('Created Date'),
-   lastModifiedDate: joi
-      .date()
-      .required()
-      .description('Last Modified Date'),
-   systemModstamp: joi
-      .date()
-      .required()
-      .description('System Modstamp'),
-   schedule: joi
-      .string()
-      .required()
-      .description('Schedule'),
-   scheduleRSid: joi
-      .any()
-      .required()
-      .description('Schedule R Sid'),
-   startDate: joi
-      .date()
-      .allow(null)
-      .description('Start Date'),
-   endDate: joi
-      .date()
-      .allow(null)
-      .description('End Date'),
-   dayOfWeek: joi
-      .number()
-      .required()
-      .description('Day Of Week'),
-   startTime: joi
-      .any()
-      .required()
-      .description('Start Time'),
-   endTime: joi
-      .any()
-      .required()
-      .description('End Time'),
-   recurring: joi
-      .string()
-      .allow(null)
-      .description('Recurring')
-  })
-  .required()
-  .description('Availability payload')
+      .description('Availability payload')
   },
   delete: {
     params: joi
@@ -189,7 +191,8 @@ let schema = {
         availabilitySid: joi
           .string()
           .required()
-          .description('Availability Sid')})
+          .description('Availability Sid')
+      })
   },
   list: {
     params: joi
@@ -202,7 +205,8 @@ let schema = {
         scheduleSid: joi
           .string()
           .required()
-          .description('Schedule Sid')}),
+          .description('Schedule Sid')
+      }),
     query: {
       offset: joi
         .number()
@@ -229,4 +233,3 @@ let schema = {
 };
 
 module.exports = schema;
-    

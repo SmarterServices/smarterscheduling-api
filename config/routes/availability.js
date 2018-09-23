@@ -5,7 +5,7 @@ const availabilitySchema = require('./schema/availability');
 const availabilityHandler = require('./../../lib/handlers/availability');
 const utils = require('./../../lib/helpers/utils');
 
-module.exports = [{
+module.exports = [/*{
   method: 'POST',
   path: '/v1/accounts/{accountSid}/schedules/{scheduleSid}/availability',
   config: {
@@ -136,4 +136,4 @@ module.exports = [{
       params: availabilitySchema.delete.params
     }
   }
-}];
+}*/];
