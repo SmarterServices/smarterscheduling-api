@@ -133,7 +133,7 @@ module.exports = [{
       }
     }
   }
-}/*, {
+}, {
   method: 'DELETE',
   path: '/v1/accounts/{accountSid}/exclusions/{exclusionSid}',
   config: {
@@ -155,6 +155,16 @@ module.exports = [{
     description: 'Delete exclusion',
     validate: {
       params: exclusionSchema.delete.params
+    },
+    plugins: {
+      paramValidate: {
+        relationName: 'exclusion',
+        primaryKey: 'exclusionSid',
+        parent: {
+          relationName: 'account',
+          primaryKey: 'accountSid'
+        }
+      }
     }
   }
-}*/];
+}];
