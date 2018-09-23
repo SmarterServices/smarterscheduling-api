@@ -5,7 +5,7 @@ const availabilitySchema = require('./schema/availability');
 const availabilityHandler = require('./../../lib/handlers/availability');
 const utils = require('./../../lib/helpers/utils');
 
-module.exports = [/*{
+module.exports = [{
   method: 'POST',
   path: '/v1/accounts/{accountSid}/schedules/{scheduleSid}/availability',
   config: {
@@ -18,20 +18,29 @@ module.exports = [/*{
 
       availabilityHandler.addAvailability(opts, function (err, r) {
         if (err) {
-          reply(Boom.badRequest(err));
+          errorResponse.formatError(err, null, reply);
         } else {
           utils.replyJson('partials/availability', {availability: r}, reply);
         }
       });
     },
     tags: ['api', 'Availability'],
-    description: 'Add availability',
+    description: 'Update availability',
     validate: {
       params: availabilitySchema.add.params,
       payload: availabilitySchema.add.payload
+    },
+    plugins: {
+      paramValidate: [{
+        relationName: 'schedule',
+        primaryKey: 'scheduleSid'
+      }, {
+        relationName: 'account',
+        primaryKey: 'accountSid'
+      }]
     }
   }
-}, {
+}/*, {
   method: 'GET',
   path: '/v1/accounts/{accountSid}/schedules/{scheduleSid}/availability',
   config: {
