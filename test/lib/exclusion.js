@@ -556,6 +556,111 @@ describe('Exclusions', function testAccounts() {
 
     });
   });
+
+  describe('DELETE', function () {
+    const urlTemplate = endpoints.exclusion.update;
+
+    it('Should delete successfully with 200 response', function* () {
+      const exclusionSid = exclusions[0].sid;
+      const url = common.buildUrl(urlTemplate, {accountSid, exclusionSid});
+
+      const listBeforeDelete = yield common.populate.exclusion.list();
+
+      yield common
+        .request
+        .delete(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+
+          expect(response.statusCode).to.equal(200);
+          expect(result).to.eql({success: 'OK'});
+        });
+
+      //check that correct row has been deleted
+      const listAfterDelete = yield common.populate.exclusion.list();
+      expect(listAfterDelete.length).to.eql(listBeforeDelete.length - 1);
+
+      for(const exclusion of listAfterDelete) {
+        expect(exclusion.sid).to.not.eql(exclusionSid);
+      }
+    });
+
+    it('Should fail to delete already deleted row and return 404 response', function () {
+      const exclusionSid = exclusions[0].sid;
+      const url = common.buildUrl(urlTemplate, {accountSid, exclusionSid});
+
+      return common
+        .request
+        .delete(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('EXCLUSION_NOT_FOUND_UNDER_ACCOUNT', response);
+        });
+    });
+
+    it('Should fail for invalid [accountSid] and return 404 response', function () {
+      const exclusionSid = exclusions[1].sid;
+      const url = common.buildUrl(urlTemplate, {
+        exclusionSid,
+        accountSid: common.makeGenericSid('SA')
+      });
+
+      return common
+        .request
+        .delete(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('ACCOUNT_NOT_FOUND', response);
+        });
+    });
+
+    it('Should fail for invalid [exclusionSid] and return 404 response', function () {
+      const url = common.buildUrl(urlTemplate, {
+        accountSid,
+        exclusionSid: common.makeGenericSid('AE')
+      });
+
+      return common
+        .request
+        .delete(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('EXCLUSION_NOT_FOUND_UNDER_ACCOUNT', response);
+        });
+    });
+
+    it('Should fail for [exclusionSid] under different [accountSid] and return 404 response', function () {
+      const exclusionSid = exclusions[1].sid;
+
+      const url = common.buildUrl(urlTemplate, {
+        exclusionSid,
+        accountSid: accountSid2
+      });
+
+      return common
+        .request
+        .delete(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('EXCLUSION_NOT_FOUND_UNDER_ACCOUNT', response);
+        });
+    });
+
+    it('Should fail for database failure of [delete exclusion] and return 400 response', function () {
+      const exclusionSid = exclusions[1].sid;
+
+      const url = common.buildUrl(urlTemplate, {accountSid, exclusionSid});
+      const request = common.request.delete(url);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'deleteData',
+          name: 'exclusion'
+        });
+    });
+  });
 });
 
 /**
