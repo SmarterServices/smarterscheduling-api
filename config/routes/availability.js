@@ -16,7 +16,7 @@ module.exports = [{
         payload: request.payload
       };
 
-      availabilityHandler.batchUpdateAvailability(opts, function (err, r) {
+      availabilityHandler.batchModifyAvailability(opts, function (err, r) {
         if (err) {
           errorResponse.formatError(err, null, reply);
         } else {
