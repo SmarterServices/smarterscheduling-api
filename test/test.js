@@ -31,6 +31,7 @@ const common = require('./common');
 const importTest = common.importTest;
 require('gulp');
 require('./../gulpfile');
+const dbBackupService = require('./../lib/services/db-backup');
 const testPaths = require('./test-paths.js').filePaths;
 
 
@@ -55,6 +56,10 @@ describe('Unit Test', function () {
       })
       .then(() => {
         return common.removeIsDeletedConstraint(sequelize.models);
+      })
+      .then(function addTriggers() {
+        return dbBackupService
+          .runScripts();
       });
   });
 

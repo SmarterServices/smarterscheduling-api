@@ -6,6 +6,7 @@ const accountData = require('./../data/account.json');
 const expect = require('chai').expect;
 const common = require('./../common');
 const endpoints = require('./../data/endpoints.json');
+const moment = require('moment');
 
 describe('Accounts', function testAccounts() {
   const accounts = [];
@@ -131,6 +132,247 @@ describe('Accounts', function testAccounts() {
           name: 'account'
         });
 
+    });
+  });
+
+  describe('LIST Appointment Availability', function () {
+    let accountSid;
+    let accountSid1;
+    let calendarSid;
+    let calendarSid1;
+    let locationSid;
+    let locationSid1;
+    const startDateTime = moment().toISOString();
+    const endDateTime = moment().add(1, 'd').toISOString();
+    const urlTemplate = endpoints.account.listAppointmentAvailability;
+    const duration = 30;
+    const TOTAL_AVAILABILITY = 5;
+
+    before('PopulateData', function* () {
+      accountSid = (yield common.populate.account.addDefault()).sid;
+      accountSid1 = (yield common.populate.account.addDefault()).sid;
+      locationSid = (yield common.populate.location.addDefault({
+        schedulingAccountSid: accountSid
+      })).sid;
+      locationSid1 = (yield common.populate.location.addDefault({
+        schedulingAccountSid: accountSid1
+      })).sid;
+      calendarSid = (yield common.populate.calendar.addDefault({
+        schedulingLocationSid: locationSid,
+        title: 'test'
+      })).sid;
+      calendarSid1 = (yield common.populate.calendar.addDefault({
+        schedulingLocationSid: locationSid1,
+        title: 'test'
+      })).sid;
+    });
+
+    after('Clean Data', function* () {
+      yield common.populate.account.clean();
+      yield common.populate.calendar.clean();
+      yield common.populate.location.clean();
+    });
+
+    it('Should list successfully and return 200 response', function () {
+      const query = {
+        calendarSid,
+        startDateTime,
+        endDateTime,
+        duration
+      };
+      const url = common.buildUrl(urlTemplate, {accountSid}, query);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result.results;
+          expect(result.length).to.eql(TOTAL_AVAILABILITY);
+          for (const appointment of result) {
+            expect(appointment.duration).to.equal(query.duration);
+          }
+        });
+    });
+
+    // TODO: Test should be updated in future, since for different calendarSid response will be different
+    it('Should list successfully for different [calendarSid] and return 200 response', function () {
+      const query = {
+        startDateTime,
+        endDateTime,
+        duration,
+        calendarSid: calendarSid1
+      };
+      const url = common.buildUrl(urlTemplate, {accountSid: accountSid1}, query);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result.results;
+          expect(result.length).to.eql(TOTAL_AVAILABILITY);
+          for (const appointment of result) {
+            expect(appointment.duration).to.equal(query.duration);
+          }
+        });
+    });
+
+    // TODO: Currently reponse is a hard-coded data only duration is dynamic
+    it('Should list successfully for different [duration] and return 200 response', function () {
+      const query = {
+        startDateTime,
+        endDateTime,
+        calendarSid,
+        duration: 30
+      };
+      const url = common.buildUrl(urlTemplate, {accountSid}, query);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result.results;
+          expect(result.length).to.eql(TOTAL_AVAILABILITY);
+          for (const appointment of result) {
+            expect(appointment.duration).to.equal(query.duration);
+          }
+        });
+    });
+
+    it('Should fail for [startDate] greater than [endDate] and return 400 response', function () {
+      const query = {
+        calendarSid,
+        startDateTime,
+        endDateTime: moment(startDateTime).subtract(1, 'd').toISOString(),
+        duration
+      };
+      const url = common.buildUrl(urlTemplate, {accountSid}, query);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('END_DATE_TIME_SHOULD_BE_AFTER_START_DATE_TIME', response);
+        });
+    });
+
+    it('Should fail for invalid [accountSid] and return 400 response', function () {
+      const query = {
+        calendarSid,
+        startDateTime,
+        endDateTime,
+        duration
+      };
+      const url = common.buildUrl(urlTemplate, {
+        accountSid: common.makeGenericSid('SA')
+      }, query);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('ACCOUNT_NOT_FOUND', response);
+        });
+    });
+
+    it('Should fail for invalid [calendarSid] and return 400 response', function () {
+      const query = {
+        startDateTime,
+        endDateTime,
+        duration,
+        calendarSid: common.makeGenericSid('CL')
+      };
+      const url = common.buildUrl(urlTemplate, {accountSid}, query);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('CALENDAR_NOT_FOUND_UNDER_ACCOUNT', response);
+        });
+    });
+
+    it('Should fail for [calendar] having different [locationSid] and return 400 response', function* () {
+      yield common.populate.calendar.update({schedulingLocationSid: locationSid1}, {sid: calendarSid});
+      const query = {
+        startDateTime,
+        endDateTime,
+        duration,
+        calendarSid
+      };
+      const url = common.buildUrl(urlTemplate, {accountSid}, query);
+
+      yield common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('CALENDAR_NOT_FOUND_UNDER_ACCOUNT', response);
+        });
+      yield common.populate.calendar.update({schedulingLocationSid: locationSid}, {sid: calendarSid});
+    });
+
+    it('Should fail for db fail of [listAppointmentAvailability] and return 400 response', function () {
+      const query = {
+        startDateTime,
+        endDateTime,
+        duration,
+        calendarSid
+      };
+      const url = common.buildUrl(urlTemplate, {accountSid}, query);
+
+      const request = common.request.get(url);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'rawQuery',
+          name: 'listAppointmentAvailability',
+          fileNamePattern: /.*services[\\\/]account\.js/
+        });
+    });
+
+    it('Should fail for db fail of [getCalendar] and return 400 response', function () {
+      const query = {
+        startDateTime,
+        endDateTime,
+        duration,
+        calendarSid
+      };
+      const url = common.buildUrl(urlTemplate, {accountSid}, query);
+
+      const request = common.request.get(url);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'getData',
+          name: 'location'
+        });
+    });
+
+    it('Should fail for db fail of [getLocation] and return 400 response', function () {
+      const query = {
+        startDateTime,
+        endDateTime,
+        duration,
+        calendarSid
+      };
+      const url = common.buildUrl(urlTemplate, {accountSid}, query);
+
+      const request = common.request.get(url);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'getData',
+          name: 'location'
+        });
     });
   });
 });

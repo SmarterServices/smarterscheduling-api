@@ -13,7 +13,12 @@
       "operatorsAliases": false,
       "ssl": true,
       "sortKey": "sid",
-      "namespace": "smarter-scheduling"
+      "namespace": "smarter-scheduling",
+      "scriptOrder": {
+        "generate.sql": 0,
+        "procedures.sql": 1,
+        "triggers.sql": 2
+      }
     }
   ],
   "logger": {
