@@ -92,6 +92,7 @@ const schema = {
               stripUnknown: true
             })
         )
+        .default([])
         .description('Availability to delete')
     })
       .required()

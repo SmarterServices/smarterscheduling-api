@@ -72,5 +72,15 @@
     "code": "1207",
     "message": "Calendar '%calendarSid%' not found under Location '%schedulingLocationSid%'",
     "status": 404
+  },
+  "SCHEDULE_NOT_FOUND_UNDER_ACCOUNT": {
+    "code": "1208",
+    "message": "Schedule '%scheduleSid%' not found under Account '%schedulingAccountSid%'",
+    "status": 404
+  },
+  "AVAILABILITY_LIST_NOT_FOUND": {
+    "code": "1209",
+    "message": "One Availability between '%availabilitySid%' not found",
+    "status": 404
   }
 }

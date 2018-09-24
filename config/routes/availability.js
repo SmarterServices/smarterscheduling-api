@@ -16,11 +16,16 @@ module.exports = [{
         payload: request.payload
       };
 
-      availabilityHandler.addAvailability(opts, function (err, r) {
+      availabilityHandler.batchUpdateAvailability(opts, function (err, r) {
         if (err) {
           errorResponse.formatError(err, null, reply);
         } else {
-          utils.replyJson('partials/availability', {availability: r}, reply);
+          utils.replyJson('availability-collection.js',
+            {
+              availability: r,
+              endpoint: utils.buildEndpointString(request),
+              query: {}
+            }, reply);
         }
       });
     },
