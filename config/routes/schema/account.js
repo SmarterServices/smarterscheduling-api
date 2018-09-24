@@ -1,6 +1,7 @@
 'use strict';
 
 const joi = require('joi');
+const utils = require('./../../../lib/helpers/utils');
 
 const schema = {
   add: {
@@ -107,6 +108,43 @@ const schema = {
         .default('ASC')
         .valid('ASC', 'DESC')
         .description('Sort order')
+    }
+  },
+  listAppointmentAvailability: {
+    params: joi
+      .object({
+        accountSid: joi
+          .string()
+          .regex(/^SA[a-f0-9]{32}$/, 'accountSid')
+          .required()
+          .description('Account Sid')
+      }),
+    query: {
+      startDateTime: joi
+        .string()
+        .isoDate()
+        .regex(/.*Z/, 'ISO time format in utc zone')
+        .example(utils.dateTemplate(), 'date template')
+        .required()
+        .description('The timestamp when the appointment is to be started'),
+      endDateTime: joi
+        .string()
+        .isoDate()
+        .regex(/.*Z/, 'ISO time format in utc zone')
+        .example(utils.dateTemplate(), 'date template')
+        .required()
+        .description('The timestamp when the appointment is to be ended'),
+      duration: joi
+        .number()
+        .integer()
+        .positive()
+        .required()
+        .description('Duration'),
+      calendarSid: joi
+        .string()
+        .regex(/^CL[a-f0-9]{32}$/, 'calendarSid')
+        .required()
+        .description('Identifier of Calendar')
     }
   }
 };

@@ -72,5 +72,15 @@
     "code": "1207",
     "message": "Calendar '%calendarSid%' not found under Location '%schedulingLocationSid%'",
     "status": 404
+  },
+  "CALENDAR_NOT_FOUND_UNDER_ACCOUNT": {
+    "code": "1209",
+    "message": "Calendar '%calendarSid%' not found under Account '%schedulingAccountSid%'",
+    "status": 404
+  },
+  "END_DATE_TIME_SHOULD_BE_AFTER_START_DATE_TIME": {
+    "code": "1210",
+    "message": "End date time '%endDateTime%' must be after start date time '%startDateTime%'",
+    "status": 404
   }
 }
