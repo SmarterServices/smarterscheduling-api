@@ -11,6 +11,7 @@ const baseAvailabilitySchema = joi
       .description('Start Date'),
     endDate: joi
       .date()
+      .min(joi.ref('startDate'))
       .allow(null)
       .description('End Date'),
     dayOfWeek: joi
