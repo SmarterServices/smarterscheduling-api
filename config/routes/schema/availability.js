@@ -41,7 +41,7 @@ const baseAvailabilitySchema = joi
   .raw();//keeping the startTime and endTime as input format
 
 const schema = {
-  add: {
+  batchModify: {
     params: joi
       .object({
         accountSid: joi

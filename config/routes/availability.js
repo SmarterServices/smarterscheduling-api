@@ -32,8 +32,8 @@ module.exports = [{
     tags: ['api', 'Availability'],
     description: 'Update availability',
     validate: {
-      params: availabilitySchema.add.params,
-      payload: availabilitySchema.add.payload
+      params: availabilitySchema.batchModify.params,
+      payload: availabilitySchema.batchModify.payload
     },
     plugins: {
       paramValidate: [{
