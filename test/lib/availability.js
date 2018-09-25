@@ -25,9 +25,10 @@ describe('Availabiilty', function testAccounts() {
 
   after('Clean Data', function* () {
     yield populate.account.clean();
-    yield populate.exclusion.clean();
+    yield populate.calendar.clean();
     yield populate.location.clean();
     yield populate.schedule.clean();
+    yield populate.availability.clean();
   });
 
   describe('POST', function () {
