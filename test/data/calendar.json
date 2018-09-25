@@ -6,5 +6,8 @@
         "numberOfSeats": 2
       }
     }
+  },
+  "build": {
+    "title": "Test Calendar"
   }
 }

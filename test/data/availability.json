@@ -1,0 +1,30 @@
+{
+  "post": {
+    "valid": {
+      "payloadToCreate": {
+        "create": [
+          {
+            "startDate": "2018-09-01",
+            "endDate": "2018-09-01",
+            "dayOfWeek": 0,
+            "startTime": "05:00",
+            "endTime": "22:00",
+            "recurring": "weekly"
+          }
+        ]
+      },
+      "payloadToUpdate": {
+        "update": [
+          {
+            "startDate": "2018-09-01",
+            "endDate": "2018-09-01",
+            "dayOfWeek": 5,
+            "startTime": "12:00",
+            "endTime": "20:00",
+            "recurring": "weekly"
+          }
+        ]
+      }
+    }
+  }
+}
