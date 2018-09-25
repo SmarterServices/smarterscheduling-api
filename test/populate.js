@@ -10,6 +10,7 @@ const Populator = require('./populator');
 
 //Require all the data needed for populate
 const accountData = require('./data/account');
+const availabilityData = require('./data/availability');
 const calendarData = require('./data/calendar');
 const locationData = require('./data/location');
 const scheduleData = require('./data/schedule');
@@ -63,7 +64,7 @@ const dataPopulate = {
     return runQuery(query, {});
   },
   account: new Populator('sc_account__c', accountData.post.payload.valid),
-  availability: new Populator('sc_availability__c', {}),
+  availability: new Populator('sc_availability__c', availabilityData.build),
   calendar: new Populator('sc_calendar__c', calendarData.build),
   calendarSeat: new Populator('sc_calendar_seat__c', {}),
   exclusion: new Populator('sc_availability_exclusion__c', {}),

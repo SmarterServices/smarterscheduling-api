@@ -34,5 +34,10 @@
         ]
       }
     }
+  },
+  "build": {
+    "dayOfWeek": 1,
+    "startTime": "12:00",
+    "endTime": "14:00"
   }
 }
