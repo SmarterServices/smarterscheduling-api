@@ -1,7 +1,8 @@
 {
   "account": {
     "post": "v1/accounts",
-    "list": "v1/accounts"
+    "list": "v1/accounts",
+    "listAppointmentAvailability": "v1/accounts/{accountSid}/availability"
   },
   "calendar": {
     "post": "v1/accounts/{accountSid}/locations/{locationSid}/calendars",

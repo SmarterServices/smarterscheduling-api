@@ -58,7 +58,7 @@ module.exports = [{
       query: accountSchema.list.query
     }
   }
-}/*, {
+},/* {
   method: 'GET',
   path: '/v1/accounts/{accountSid}',
   config: {
@@ -132,4 +132,39 @@ module.exports = [{
       params: accountSchema.delete.params
     }
   }
-}*/];
+}*/{
+  method: 'GET',
+  path: '/v1/accounts/{accountSid}/availability',
+  config: {
+    handler: function (request, reply) {
+
+      const opts = {
+        query: Object.assign({}, request.query),
+        paramValidationResult: request.paramValidationResult
+      };
+
+      accountHandler.listAppointmentAvailability(opts, function (err, r) {
+        if (err) {
+          errorResponse.formatError(err, null, reply);
+        } else {
+          utils.replyJson('appointment-availability-collection.js',
+            {
+              appointmentAvailability: r,
+            }, reply);
+        }
+      });
+    },
+    tags: ['api', 'Account'],
+    description: 'List Appointment Availability',
+    validate: {
+      params: accountSchema.listAppointmentAvailability.params,
+      query: accountSchema.listAppointmentAvailability.query
+    },
+    plugins: {
+      paramValidate: {
+        relationName: 'account',
+        primaryKey: 'accountSid'
+      }
+    }
+  }
+}];
