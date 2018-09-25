@@ -11,7 +11,8 @@
   "calendar": {
     "post": "v1/accounts/{accountSid}/locations/{locationSid}/calendars",
     "list": "v1/accounts/{accountSid}/locations/{locationSid}/calendars",
-    "get": "v1/accounts/{accountSid}/locations/{locationSid}/calendars/{calendarSid}"
+    "get": "v1/accounts/{accountSid}/locations/{locationSid}/calendars/{calendarSid}",
+    "update": "v1/accounts/{accountSid}/locations/{locationSid}/calendars/{calendarSid}"
   },
   "exclusion": {
     "post": "v1/accounts/{accountSid}/exclusions",

@@ -581,5 +581,49 @@ describe('Calendar', function testCalendar() {
         });
     });
   });
+
+
+  describe('PUT', function () {
+    const urlTemplate = endpoints.calendar.update;
+    let calendarSid;
+
+    before('Init Data', () => {
+      calendarSid = calendars[0].sid;
+    });
+
+    it('Should update calendar successfully and return 200 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .put(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(response.statusCode).to.equal(200);
+
+          assertCalendarData(payload, calendars[0], result);
+        });
+    });
+
+
+    /**
+     * Validate calendar data
+     * @param {Object} payload - Payload sent for update
+     * @param {Object} previousData - Previous calendar data
+     * @param {Object} response - Response from update
+     */
+    function assertCalendarData(payload, previousData, response) {
+      expect(payload.title).to.equal(response.title);
+      expect(payload.numberOfSeats).to.equal(response.numberOfSeats);
+
+      expect(previousData.schedule.sid).to.equal(response.schedule.sid);
+      expect(payload.interval).to.equal(response.schedule.interval);
+      expect(payload.endBuffer).to.equal(response.schedule.endBuffer);
+    }
+  });
 });
 

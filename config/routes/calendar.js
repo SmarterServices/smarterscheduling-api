@@ -121,7 +121,7 @@ module.exports = [{
       }
     }
   }
-}, /*{
+}, {
   method: 'PUT',
   path: '/v1/accounts/{accountSid}/locations/{locationSid}/calendars/{calendarSid}',
   config: {
@@ -129,12 +129,13 @@ module.exports = [{
 
       const opts = {
         params: request.params,
-        payload: request.payload
+        payload: request.payload,
+        paramValidationResult: request.paramValidationResult
       };
 
       calendarHandler.updateCalendar(opts, function (err, r) {
         if (err) {
-          reply(Boom.badRequest(err));
+          errorResponse.formatError(err, null, reply);
         } else {
           utils.replyJson('partials/calendar', {calendar: r}, reply);
         }
@@ -145,9 +146,22 @@ module.exports = [{
     validate: {
       params: calendarSchema.update.params,
       payload: calendarSchema.update.payload
+    },
+    plugins: {
+      paramValidate: {
+        relationName: 'calendar',
+        primaryKey: 'calendarSid',
+        ancestor: [{
+          relationName: 'location',
+          primaryKey: 'locationSid'
+        }, {
+          relationName: 'account',
+          primaryKey: 'accountSid'
+        }]
+      }
     }
   }
-}, {
+}, /*{
   method: 'DELETE',
   path: '/v1/accounts/{accountSid}/locations/{locationSid}/calendars/{calendarSid}',
   config: {

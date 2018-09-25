@@ -70,55 +70,44 @@ const schema = {
       .object({
         accountSid: joi
           .string()
+          .regex(/^SA[a-f0-9]{32}$/, 'Account Sid')
           .required()
           .description('Account Sid'),
-
         locationSid: joi
           .string()
+          .regex(/^SL[a-f0-9]{32}$/, 'Location Sid')
           .required()
           .description('Location Sid'),
-
         calendarSid: joi
           .string()
+          .regex(/^CL[a-f0-9]{32}$/, 'Calendar Sid')
           .required()
           .description('Calendar Sid')}),
     payload: joi.object({
-      id: joi
-        .string()
-        .required()
-        .description('Id'),
-      isDeleted: joi
-        .boolean()
-        .required()
-        .description('Is Deleted'),
-      name: joi
-        .string()
-        .required()
-        .description('Name'),
-      createdDate: joi
-        .date()
-        .required()
-        .description('Created Date'),
-      lastModifiedDate: joi
-        .date()
-        .required()
-        .description('Last Modified Date'),
-      systemModstamp: joi
-        .date()
-        .required()
-        .description('System Modstamp'),
-      schedulingLocation: joi
-        .string()
-        .required()
-        .description('Scheduling Location'),
-      schedulingLocationRSid: joi
-        .any()
-        .required()
-        .description('Scheduling Location R Sid'),
       title: joi
         .string()
+        .max(255)
         .required()
-        .description('Title')
+        .description('Title'),
+      numberOfSeats: joi
+        .number()
+        .integer()
+        .positive()
+        .description('Number of seats'),
+      interval: joi
+        .number()
+        .integer()
+        .default(10)
+        .min(0)
+        .max(999)
+        .description('Interval'),
+      endBuffer: joi
+        .number()
+        .integer()
+        .default(0)
+        .min(0)
+        .max(999)
+        .description('End buffer')
     })
       .required()
       .description('Calendar payload')
