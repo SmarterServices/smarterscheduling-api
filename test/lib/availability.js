@@ -8,7 +8,7 @@ const common = require('./../common');
 const {populate} = common;
 const endpoints = require('./../data/endpoints.json');
 
-describe('Availabiilty', function testAccounts() {
+describe('Availability', function testAccounts() {
   let accountSid;
   let accountSid2;
   let scheduleSid;
@@ -123,7 +123,7 @@ describe('Availabiilty', function testAccounts() {
 
           expect(response.statusCode).to.eql(200);
           const availabilityList = result.results;
-
+          expect(availabilityList.length).to.be.at.least(1);
           expect(availabilityList.length).to.eql(availabilities.length - 2);
           for (const availability of availabilityList) {
             expect(availability.sid).to.not.eql(availabilitySid1);
@@ -159,6 +159,7 @@ describe('Availabiilty', function testAccounts() {
 
           expect(response.statusCode).to.eql(200);
           const availabilityList = result.results;
+          expect(availabilityList.length).to.be.at.least(2);
           availabilities = result.results;
 
           for (const availability of availabilityList) {
@@ -167,6 +168,275 @@ describe('Availabiilty', function testAccounts() {
           }
 
         });
+    });
+
+    it('Should fail for invalid [accountSid] and return 404 response', function () {
+      const payload = getPayload();
+      payload.update[0].sid = availabilities[0].sid;
+      payload.delete[0].sid = availabilities[0].sid;
+
+      const url = common.buildUrl(urlTemplate, {
+        scheduleSid,
+        accountSid: common.makeGenericSid('SA')
+      });
+
+      return common
+        .request
+        .post(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('ACCOUNT_NOT_FOUND', response);
+        });
+    });
+
+    it('Should fail for invalid [scheduleSid] and return 404 response', function () {
+      const payload = getPayload();
+      payload.update[0].sid = availabilities[0].sid;
+      payload.delete[0].sid = availabilities[0].sid;
+
+      const url = common.buildUrl(urlTemplate, {
+        accountSid,
+        scheduleSid: common.makeGenericSid('SC')
+      });
+
+      return common
+        .request
+        .post(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('SCHEDULE_NOT_FOUND', response);
+        });
+    });
+
+    it('Should fail for [scheduleSid] under different [accountSid] and return 404 response', function () {
+      const payload = getPayload();
+      payload.update[0].sid = availabilities[0].sid;
+      payload.delete[0].sid = availabilities[0].sid;
+
+      const url = common.buildUrl(urlTemplate, {
+        scheduleSid,
+        accountSid: accountSid2
+      });
+
+      return common
+        .request
+        .post(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('SCHEDULE_NOT_FOUND_UNDER_ACCOUNT', response);
+        });
+    });
+
+    it('Should fail for invalid [availabilitySid] return 404 response', function () {
+      const payload = getPayload();
+      payload.update[0].sid = common.makeGenericSid('AV');
+      payload.delete[0].sid = common.makeGenericSid('AV');
+
+      const url = common.buildUrl(urlTemplate, {scheduleSid, accountSid});
+
+      return common
+        .request
+        .post(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('AVAILABILITY_LIST_NOT_FOUND', response);
+        });
+    });
+
+    it('Should fail for [availabilitySid] under different [scheduleSid] and return 404 response', function* () {
+      const payload = getPayload(['delete']);
+      const availabilitySid = availabilities[0].sid;
+      payload.delete[0].sid = availabilitySid;
+
+      //modify the availability to have a different schedule
+      yield populate.availability.update({scheduleSid: common.makeGenericSid('SC')}, {sid: availabilitySid});
+
+      const url = common.buildUrl(urlTemplate, {scheduleSid, accountSid});
+
+      yield common
+        .request
+        .post(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('AVAILABILITY_LIST_NOT_FOUND', response);
+        });
+
+      //revert changes
+      yield populate.availability.update({scheduleSid}, {sid: availabilitySid});
+    });
+
+    it('Should fail for [endDate] before [startDate] while creating availability and return 400 response', function () {
+      const payload = getPayload(['create']);
+      payload.create[0].startDate = moment().format('YYYY-MM-DD');
+      payload.create[0].endDate = moment(payload.create[0].startDate).subtract(1, 'day').format('YYYY-MM-DD');
+
+      const url = common.buildUrl(urlTemplate, {scheduleSid, accountSid});
+
+      return common
+        .request
+        .post(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(response.statusCode).to.eql(400);
+          expect(result.status).to.eql(400);
+          expect(result.code).to.eql(errorResponse.ERROR_LIST.JOI.NOT_LISTED.code);
+        });
+    });
+
+    it('Should fail for [endDate] before [startDate] while updating availability and return 400 response', function () {
+      const payload = getPayload(['update']);
+
+      payload.update[0].sid = availabilities[0].sid;
+      payload.update[0].startDate = moment().format('YYYY-MM-DD');
+      payload.update[0].endDate = moment(payload.update[0].startDate).subtract(1, 'day').format('YYYY-MM-DD');
+
+      const url = common.buildUrl(urlTemplate, {scheduleSid, accountSid});
+
+      return common
+        .request
+        .post(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(response.statusCode).to.eql(400);
+          expect(result.status).to.eql(400);
+          expect(result.code).to.eql(errorResponse.ERROR_LIST.JOI.NOT_LISTED.code);
+        });
+    });
+
+    it('Should fail for [endTime] before [startTime] while creating availability and return 400 response', function () {
+      const payload = getPayload(['create']);
+
+      payload.create[0].startTime = '20:15';
+      payload.create[0].endDate = '10:15';
+
+      const url = common.buildUrl(urlTemplate, {scheduleSid, accountSid});
+
+      return common
+        .request
+        .post(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(response.statusCode).to.eql(400);
+          expect(result.status).to.eql(400);
+          expect(result.code).to.eql(errorResponse.ERROR_LIST.JOI.NOT_LISTED.code);
+        });
+    });
+
+    it('Should fail for [endTime] before [startTime] while updating availability and return 400 response', function () {
+      const payload = getPayload(['update']);
+
+      payload.update[0].sid = availabilities[0].sid;
+
+      payload.update[0].startTime = '20:15';
+      payload.update[0].endDate = '10:15';
+
+      const url = common.buildUrl(urlTemplate, {scheduleSid, accountSid});
+
+      return common
+        .request
+        .post(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(response.statusCode).to.eql(400);
+          expect(result.status).to.eql(400);
+          expect(result.code).to.eql(errorResponse.ERROR_LIST.JOI.NOT_LISTED.code);
+        });
+    });
+
+    it('Should fail for database failure of [validateScheduleAndAccount] and return 400 response', function () {
+      const payload = getPayload();
+      payload.update[0].sid = availabilities[0].sid;
+      payload.delete[0].sid = availabilities[0].sid;
+
+      const url = common.buildUrl(urlTemplate, {scheduleSid, accountSid});
+
+      const apiRequest = common.request.post(url).send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request: apiRequest,
+          type: 'rawQuery',
+          name: 'validateScheduleAndAccount',
+          fileNamePattern: /.*services[\\\/]schedule\.js/
+        });
+    });
+
+    it('Should fail for database failure of [bulkcreate availability] and return 400 response', function* () {
+      const payload = getPayload();
+      payload.update[0].sid = availabilities[0].sid;
+      payload.delete[0].sid = availabilities[1].sid;
+
+      const url = common.buildUrl(urlTemplate, {scheduleSid, accountSid});
+
+      const apiRequest = common.request.post(url).send(payload);
+
+      const availabilityBeforeRequest = yield populate.availability.list({scheduleSid});
+
+      yield common
+        .testDatabaseFailure({
+          request: apiRequest,
+          type: 'bulkCreate',
+          name: 'availability'
+        });
+
+      const availabilityAfterRequest = yield populate.availability.list({scheduleSid});
+      expect(availabilityBeforeRequest).to.have.deep.members(availabilityAfterRequest);
+    });
+
+    it('Should fail for database failure of [batch update availability] and return 400 response', function* () {
+      const payload = getPayload(['create', 'update']);
+      payload.update[0].sid = availabilities[0].sid;
+
+      const url = common.buildUrl(urlTemplate, {scheduleSid, accountSid});
+
+      const availabilityBeforeRequest = yield populate.availability.list({scheduleSid});
+
+      const apiRequest = common.request.post(url).send(payload);
+
+      yield common
+        .testDatabaseFailure({
+          request: apiRequest,
+          type: 'rawQuery',
+          name: 'batchUpdateAvailability',
+          fileNamePattern: /.*services[\\\/]availability\.js/
+        });
+
+      const availabilityAfterRequest = yield populate.availability.list({scheduleSid});
+      expect(availabilityBeforeRequest).to.have.deep.members(availabilityAfterRequest);
+    });
+
+    it('Should fail for database failure of [batch delete availability] and return 400 response', function* () {
+      const payload = getPayload(['create', 'delete']);
+      payload.delete[0].sid = availabilities[0].sid;
+
+      const url = common.buildUrl(urlTemplate, {scheduleSid, accountSid});
+
+      const availabilityBeforeRequest = yield populate.availability.list({scheduleSid});
+
+      const apiRequest = common.request.post(url).send(payload);
+
+      yield common
+        .testDatabaseFailure({
+          request: apiRequest,
+          type: 'deleteData',
+          name: 'availability'
+        });
+
+      const availabilityAfterRequest = yield populate.availability.list({scheduleSid});
+      expect(availabilityBeforeRequest).to.have.deep.members(availabilityAfterRequest);
     });
 
 
