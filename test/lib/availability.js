@@ -170,6 +170,34 @@ describe('Availability', function testAccounts() {
         });
     });
 
+    it('Should list under specific [scheduleSid] after crud and return 200 response', function* () {
+      const payload = getPayload(['create']);
+      setDynamicDate(payload.create);
+
+      const availabilitySid = availabilities[0].sid;
+
+      //update availability to have a different schedule
+      yield populate.availability.update({scheduleSid: common.makeGenericSid('SC')}, {sid: availabilitySid});
+
+      const url = common.buildUrl(urlTemplate, {accountSid, scheduleSid});
+
+      return common
+        .request
+        .post(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+
+          expect(response.statusCode).to.eql(200);
+          availabilities = result.results;
+
+          for (let availability of availabilities) {
+            expect(availability.sid).to.not.eql(availabilitySid);
+          }
+        });
+    });
+
     it('Should fail for invalid [accountSid] and return 404 response', function () {
       const payload = getPayload();
       payload.update[0].sid = availabilities[0].sid;
