@@ -4,6 +4,9 @@
     "list": "v1/accounts",
     "listAppointmentAvailability": "v1/accounts/{accountSid}/availability"
   },
+  "availability": {
+    "post": "v1/accounts/{accountSid}/schedules/{scheduleSid}/availability"
+  },
   "calendar": {
     "post": "v1/accounts/{accountSid}/locations/{locationSid}/calendars",
     "list": "v1/accounts/{accountSid}/locations/{locationSid}/calendars",

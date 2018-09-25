@@ -73,13 +73,23 @@
     "message": "Calendar '%calendarSid%' not found under Location '%schedulingLocationSid%'",
     "status": 404
   },
-  "CALENDAR_NOT_FOUND_UNDER_ACCOUNT": {
+  "SCHEDULE_NOT_FOUND_UNDER_ACCOUNT": {
+    "code": "1208",
+    "message": "Schedule '%scheduleSid%' not found under Account '%schedulingAccountSid%'",
+    "status": 404
+  },
+  "AVAILABILITY_LIST_NOT_FOUND": {
     "code": "1209",
+    "message": "One Availability between '%availabilitySid%' not found",
+    "status": 404
+  },
+  "CALENDAR_NOT_FOUND_UNDER_ACCOUNT": {
+    "code": "1210",
     "message": "Calendar '%calendarSid%' not found under Account '%schedulingAccountSid%'",
     "status": 404
   },
   "END_DATE_TIME_SHOULD_BE_AFTER_START_DATE_TIME": {
-    "code": "1210",
+    "code": "1211",
     "message": "End date time '%endDateTime%' must be after start date time '%startDateTime%'",
     "status": 404
   }

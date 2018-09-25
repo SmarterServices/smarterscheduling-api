@@ -4,6 +4,7 @@ const testPaths = {
   filePaths: [
     [
       './lib/account',
+      './lib/availability',
       './lib/calendar'
     ],
     [
