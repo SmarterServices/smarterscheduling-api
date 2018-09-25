@@ -45,7 +45,7 @@ module.exports = [{
       }]
     }
   }
-}/*, {
+}, {
   method: 'GET',
   path: '/v1/accounts/{accountSid}/schedules/{scheduleSid}/availability',
   config: {
@@ -58,7 +58,7 @@ module.exports = [{
 
       availabilityHandler.listAvailability(opts, function (err, r) {
         if (err) {
-          reply(Boom.badRequest(err));
+          errorResponse.formatError(err, null, reply);
         } else {
           utils.replyJson('availability-collection.js',
             {
@@ -74,9 +74,18 @@ module.exports = [{
     validate: {
       params: availabilitySchema.list.params,
       query: availabilitySchema.list.query
+    },
+    plugins: {
+      paramValidate: [{
+        relationName: 'schedule',
+        primaryKey: 'scheduleSid'
+      }, {
+        relationName: 'account',
+        primaryKey: 'accountSid'
+      }]
     }
   }
-}, {
+}/*, {
   method: 'GET',
   path: '/v1/accounts/{accountSid}/schedules/{scheduleSid}/availability/{availabilitySid}',
   config: {
