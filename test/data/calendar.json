@@ -6,5 +6,15 @@
         "numberOfSeats": 2
       }
     }
+  },
+  "update": {
+    "payload": {
+      "valid": {
+        "title": "Updated title",
+        "numberOfSeats": 2,
+        "interval": 10,
+        "endBuffer": 2
+      }
+    }
   }
 }
