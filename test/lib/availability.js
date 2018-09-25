@@ -11,16 +11,23 @@ const endpoints = require('./../data/endpoints.json');
 describe('Availability', function testAccounts() {
   let accountSid;
   let accountSid2;
+  let accountSid3;
   let scheduleSid;
-  let availabilities = [];
+  let scheduleSid2;
+  let scheduleSid3;
 
   before('PopulateData', function* () {
+    const addedSids = yield createAccountAndSchedule();
+    accountSid = addedSids.accountSid;
+    scheduleSid = addedSids.scheduleSid;
 
-    accountSid = (yield populate.account.addDefault()).sid;
-    accountSid2 = (yield populate.account.addDefault()).sid;
-    const locationSid = (yield populate.location.addDefault({schedulingAccountSid: accountSid})).sid;
-    const calendarSid = (yield populate.calendar.addDefault({schedulingLocationSid: locationSid})).sid;
-    scheduleSid = (yield populate.schedule.addDefault({calendarSid})).sid;
+    const addedSids2 = yield createAccountAndSchedule();
+    accountSid2 = addedSids2.accountSid;
+    scheduleSid2 = addedSids2.scheduleSid;
+
+    const addedSids3 = yield createAccountAndSchedule();
+    accountSid3 = addedSids3.accountSid;
+    scheduleSid3 = addedSids3.scheduleSid;
   });
 
   after('Clean Data', function* () {
@@ -32,6 +39,7 @@ describe('Availability', function testAccounts() {
   });
 
   describe('POST', function () {
+    let availabilities = [];
     const urlTemplate = endpoints.availability.post;
     const omittedField = ['sid', 'createdDate', 'editDate'];
 
@@ -192,7 +200,7 @@ describe('Availability', function testAccounts() {
           expect(response.statusCode).to.eql(200);
           availabilities = result.results;
 
-          for (let availability of availabilities) {
+          for (const availability of availabilities) {
             expect(availability.sid).to.not.eql(availabilitySid);
           }
         });
@@ -502,6 +510,196 @@ describe('Availability', function testAccounts() {
     }
 
   });
+
+  describe('LIST', function () {
+    const urlTemplate = endpoints.availability.list;
+    const availabilities = [];
+    before('PopulateData', function* () {
+      const availability = yield createAvailability(scheduleSid2);
+      availabilities.push(availability);
+      const availability2 = yield createAvailability(scheduleSid2);
+      availabilities.push(availability2);
+      const availability3 = yield createAvailability(scheduleSid2);
+      availabilities.push(availability3);
+    });
+
+    it('Should list availability successfully and return 200 response', function () {
+      const url = common.buildUrl(urlTemplate, {
+        accountSid: accountSid2,
+        scheduleSid: scheduleSid2
+      });
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+
+          expect(response.statusCode).to.eql(200);
+          expect(result.total).to.eql(availabilities.length);
+          expect(result.count).to.eql(availabilities.length);
+          expect(result.results.length).to.eql(availabilities.length);
+          expect(result.results).to.have.deep.members(availabilities);
+        });
+    });
+
+    it('Should list availability with [limit, offset] successfully and return 200 response', function () {
+      const params = {
+        accountSid: accountSid2,
+        scheduleSid: scheduleSid2
+      };
+      const limit = 1;
+      let offset = 1;
+      const url = common.buildUrl(urlTemplate, params, {limit, offset});
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.verifyPagination(response);
+          const result = response.result;
+
+          expect(response.statusCode).to.eql(200);
+          expect(result.total).to.eql(availabilities.length);
+          expect(result.count).to.eql(limit);
+          expect(result.results.length).to.eql(limit);
+
+          for (const exclusion of result.results) {
+            expect(exclusion).to.eql(availabilities[offset++]);
+          }
+        });
+    });
+
+    it('Should list zero availability for different [scheduleSid] and return 200 response', function () {
+      const params = {
+        accountSid: accountSid3,
+        scheduleSid: scheduleSid3
+      };
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+
+          expect(response.statusCode).to.eql(200);
+          expect(result.total).to.eql(0);
+          expect(result.count).to.eql(0);
+          expect(result.results.length).to.eql(0);
+        });
+    });
+
+    it('Should fail for invalid [accountSid] and return 404 response', function () {
+      const url = common.buildUrl(urlTemplate, {
+        accountSid: common.makeGenericSid('SA'),
+        scheduleSid: scheduleSid2
+      });
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('ACCOUNT_NOT_FOUND', response);
+        });
+    });
+
+    it('Should fail for invalid [scheduleSid] and return 404 response', function () {
+      const url = common.buildUrl(urlTemplate, {
+        accountSid: accountSid2,
+        scheduleSid: common.makeGenericSid('SC')
+      });
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('SCHEDULE_NOT_FOUND', response);
+        });
+    });
+
+    it('Should fail for [scheduleSid] under different [accountSid] and return 404 response', function () {
+      const url = common.buildUrl(urlTemplate, {
+        accountSid,
+        scheduleSid: scheduleSid2
+      });
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('SCHEDULE_NOT_FOUND_UNDER_ACCOUNT', response);
+        });
+    });
+
+    it('Should fail for database failure of [validateScheduleAndAccount] and return 400 response', function () {
+      const url = common.buildUrl(urlTemplate, {scheduleSid, accountSid});
+
+      const apiRequest = common.request.get(url);
+
+      return common
+        .testDatabaseFailure({
+          request: apiRequest,
+          type: 'rawQuery',
+          name: 'validateScheduleAndAccount',
+          fileNamePattern: /.*services[\\\/]schedule\.js/
+        });
+    });
+
+    it('Should fail for database failure of [list availability] and return 400 response', function () {
+      const url = common.buildUrl(urlTemplate, {scheduleSid, accountSid});
+
+      const apiRequest = common.request.get(url);
+
+      return common
+        .testDatabaseFailure({
+          request: apiRequest,
+          type: 'listData',
+          name: 'availability'
+        });
+    });
+
+
+    /**
+     * Creates an availability and return formatted response
+     * @param {string} scheduleSid - Availability will be added under this schedule
+     * @returns {Object} - Formatted response
+     */
+    function* createAvailability(scheduleSid) {
+      const omittedField = ['id', 'isDeleted', 'name', 'systemModstamp', 'schedule', 'lastModifiedDate'];
+      const payload = {
+        scheduleSid,
+        startDate: moment().utc().format('YYYY-MM-DD'),
+        endDate: moment().utc().format('YYYY-MM-DD'),
+        startTime: moment().utc().format('HH:mm'),
+        endTime: moment().utc().format('HH:mm'),
+        recurring: 'weekly'
+      };
+
+      let availability = yield populate.availability.addDefault(payload);
+      availability = availability.dataValues;
+      availability.createdDate = availability.createdDate.toISOString();
+      availability.editDate = availability.lastModifiedDate.toISOString();
+      return _.omit(availability, omittedField);
+    }
+  });
 });
 
+/**
+ * Creates account to schedule with proper join
+ * @returns {Object} - Sid of account and schedule
+ */
+function* createAccountAndSchedule() {
+  const accountSid = (yield populate.account.addDefault()).sid;
+  const locationSid = (yield populate.location.addDefault({schedulingAccountSid: accountSid})).sid;
+  const calendarSid = (yield populate.calendar.addDefault({schedulingLocationSid: locationSid})).sid;
+  const scheduleSid = (yield populate.schedule.addDefault({calendarSid})).sid;
+  return {accountSid, scheduleSid};
+}
 
