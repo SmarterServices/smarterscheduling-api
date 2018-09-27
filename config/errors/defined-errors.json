@@ -97,5 +97,10 @@
     "code": "1212",
     "message": "Sid '%sid%' already exists",
     "status": 404
+  },
+  "CALENDAR_NOT_FOUND": {
+    "code": "1213",
+    "message": "Calendar'%calendarSid%' not found",
+    "status": 404
   }
 }

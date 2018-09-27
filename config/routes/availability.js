@@ -85,6 +85,47 @@ module.exports = [{
       }]
     }
   }
+}, {
+  method: 'GET',
+  path: '/v1/accounts/{accountSid}/calendars/{calendarSid}/availability',
+  config: {
+    handler: function (request, reply) {
+
+      const opts = {
+        params: request.params,
+        query: Object.assign({}, request.query),
+        paramValidationResult: request.paramValidationResult
+      };
+
+      availabilityHandler.listCalendarAvailability(opts, function (err, r) {
+        if (err) {
+          errorResponse.formatError(err, null, reply);
+        } else {
+          utils.replyJson('calendar-availability-collection.js',
+            {
+              availability: r,
+              endpoint: utils.buildEndpointString(request),
+              query: request.query
+            }, reply);
+        }
+      });
+    },
+    tags: ['api', 'Availability'],
+    description: 'List availability',
+    validate: {
+      params: availabilitySchema.listCalendarAvailability.params,
+      query: availabilitySchema.listCalendarAvailability.query
+    },
+    plugins: {
+      paramValidate: [{
+        relationName: 'account',
+        primaryKey: 'accountSid'
+      }, {
+        relationName: 'calendar',
+        primaryKey: 'calendarSid'
+      }]
+    }
+  }
 }/*, {
   method: 'GET',
   path: '/v1/accounts/{accountSid}/schedules/{scheduleSid}/availability/{availabilitySid}',
