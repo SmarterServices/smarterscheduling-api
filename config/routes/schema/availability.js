@@ -256,6 +256,38 @@ const schema = {
         .default('ASC')
         .description('Sort order')
     }
+  },
+  listCalendarAvailability: {
+    params: joi
+      .object({
+        accountSid: joi
+          .string()
+          .regex(/^SA[a-f0-9]{32}$/, 'Account Sid')
+          .required()
+          .description('Account Sid'),
+        calendarSid: joi
+          .string()
+          .regex(/^CL[a-f0-9]{32}$/, 'Calendar Sid')
+          .required()
+          .description('Schedule Sid')
+      }),
+    query:joi
+      .object({
+        startDate: joi
+          .date()
+          .format('YYYY-MM-DD')
+          .required()
+          .description('Start Date'),
+        endDate: joi
+          .date()
+          .format('YYYY-MM-DD')
+          .min(joi.ref('startDate'))
+          .required()
+          .description('End Date')
+      })
+      .required()
+      .raw()//keeping the startTime and endTime as input format
+      .description('Query to get data')
   }
 };
 
