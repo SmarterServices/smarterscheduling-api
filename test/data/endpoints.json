@@ -6,7 +6,8 @@
   },
   "availability": {
     "post": "v1/accounts/{accountSid}/schedules/{scheduleSid}/availability",
-    "list": "v1/accounts/{accountSid}/schedules/{scheduleSid}/availability"
+    "list": "v1/accounts/{accountSid}/schedules/{scheduleSid}/availability",
+    "listCalendarAvailability": "v1/accounts/{accountSid}/calendars/{calendarSid}/availability"
   },
   "calendar": {
     "post": "v1/accounts/{accountSid}/locations/{locationSid}/calendars",

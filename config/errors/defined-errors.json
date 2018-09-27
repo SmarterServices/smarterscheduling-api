@@ -92,5 +92,10 @@
     "code": "1211",
     "message": "One Availability between '%availabilitySid%' not found",
     "status": 404
+  },
+  "CALENDAR_NOT_FOUND": {
+    "code": "1212",
+    "message": "Calendar'%calendarSid%' not found",
+    "status": 404
   }
 }

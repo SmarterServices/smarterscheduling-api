@@ -15,19 +15,27 @@ describe('Availability', function testAccounts() {
   let scheduleSid;
   let scheduleSid2;
   let scheduleSid3;
+  let calendarSid;
+  let calendarSid2;
+  let calendarSid3;
+  let locationSid;
 
   before('PopulateData', function* () {
     const addedSids = yield createAccountAndSchedule();
     accountSid = addedSids.accountSid;
     scheduleSid = addedSids.scheduleSid;
+    calendarSid = addedSids.calendarSid;
+    locationSid = addedSids.locationSid;
 
     const addedSids2 = yield createAccountAndSchedule();
     accountSid2 = addedSids2.accountSid;
     scheduleSid2 = addedSids2.scheduleSid;
+    calendarSid2 = addedSids2.calendarSid;
 
     const addedSids3 = yield createAccountAndSchedule();
     accountSid3 = addedSids3.accountSid;
     scheduleSid3 = addedSids3.scheduleSid;
+    calendarSid3 = addedSids3.calendarSid;
   });
 
   after('Clean Data', function* () {
@@ -41,7 +49,7 @@ describe('Availability', function testAccounts() {
   describe('POST', function () {
     let availabilities = [];
     const urlTemplate = endpoints.availability.post;
-    const omittedField = ['sid', 'createdDate', 'editDate'];
+    const omittedField = ['sid', 'createdDate', 'editDate', 'name'];
 
     it('Should Add availability successfully and return 200 response', function () {
       const payload = getPayload(['create']);
@@ -672,7 +680,7 @@ describe('Availability', function testAccounts() {
      * @returns {Object} - Formatted response
      */
     function* createAvailability(scheduleSid) {
-      const omittedField = ['id', 'isDeleted', 'name', 'systemModstamp', 'schedule', 'lastModifiedDate'];
+      const omittedField = ['id', 'isDeleted', 'systemModstamp', 'schedule', 'lastModifiedDate'];
       const payload = {
         scheduleSid,
         startDate: moment().utc().format('YYYY-MM-DD'),
@@ -689,6 +697,255 @@ describe('Availability', function testAccounts() {
       return _.omit(availability, omittedField);
     }
   });
+
+
+  describe('List Calendar Availability', function () {
+    let accountSid;
+    let calendarSid;
+    let scheduleSid;
+    const urlTemplate = endpoints.availability.listCalendarAvailability;
+    const availabilityDays = ['2069-01-01', '2069-01-02', '2069-01-31'];
+    const availabilities = {
+      [availabilityDays[0]]: [],
+      [availabilityDays[1]]: [],
+      [availabilityDays[2]]: []
+    };
+
+    before('PopulateData', function* () {
+      accountSid = accountSid3;
+      calendarSid = calendarSid3;
+      scheduleSid = scheduleSid3;
+
+      const availability = yield createAvailability(scheduleSid, availabilityDays[0]);
+      availabilities[availabilityDays[0]].push(availability);
+
+      const availability2 = yield createAvailability(scheduleSid, availabilityDays[1]);
+      availabilities[availabilityDays[1]].push(availability2);
+
+      const availability3 = yield createAvailability(scheduleSid, availabilityDays[1]);
+      availabilities[availabilityDays[1]].push(availability3);
+
+      const availability4 = yield createAvailability(scheduleSid, availabilityDays[2]);
+      availabilities[availabilityDays[2]].push(availability4);
+
+      yield createCalendarSeats(calendarSid, locationSid, scheduleSid, 1);
+    });
+
+    it('Should list availability for [calendar] successfully and return 200 response', function () {
+      const url = common.buildUrl(urlTemplate,
+        {
+          accountSid,
+          calendarSid
+        },
+        {
+          startDate: availabilityDays[0],
+          endDate: availabilityDays[2]
+        });
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+
+          expect(response.statusCode).to.eql(200);
+
+          assertCalendarAvailability(result.results, availabilities);
+        });
+    });
+
+
+    it('Should fail for invalid [accountSid] and return 404 response', function () {
+      const url = common.buildUrl(urlTemplate,
+        {
+          accountSid: common.makeGenericSid('SA'),
+          calendarSid
+        },
+        {
+          startDate: availabilityDays[0],
+          endDate: availabilityDays[2]
+        });
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+
+          common.assertFailResponse('ACCOUNT_NOT_FOUND', response);
+        });
+    });
+
+
+    it('Should fail for different [accountSid] and return 404 response', function () {
+      const url = common.buildUrl(urlTemplate,
+        {
+          accountSid: accountSid2,
+          calendarSid
+        },
+        {
+          startDate: availabilityDays[0],
+          endDate: availabilityDays[2]
+        });
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+
+          common.assertFailResponse('CALENDAR_NOT_FOUND_UNDER_ACCOUNT', response);
+        });
+    });
+
+
+    it('Should fail for invalid [calendarSid] and return 404 response', function () {
+      const url = common.buildUrl(urlTemplate,
+        {
+          accountSid,
+          calendarSid: common.makeGenericSid('CL')
+        },
+        {
+          startDate: availabilityDays[0],
+          endDate: availabilityDays[2]
+        });
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+
+          common.assertFailResponse('CALENDAR_NOT_FOUND', response);
+        });
+    });
+
+
+    it('Should fail for db fail in [getLocation] and return 400 response', function () {
+      const url = common.buildUrl(urlTemplate,
+        {
+          accountSid,
+          calendarSid
+        },
+        {
+          startDate: availabilityDays[0],
+          endDate: availabilityDays[2]
+        });
+
+      const request = common.request.get(url);
+
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'getData',
+          name: 'location'
+        });
+    });
+
+
+    it('Should fail for db fail in [listCalendarAvailability] and return 400 response', function () {
+      const url = common.buildUrl(urlTemplate,
+        {
+          accountSid,
+          calendarSid
+        },
+        {
+          startDate: availabilityDays[0],
+          endDate: availabilityDays[2]
+        });
+
+      const request = common.request.get(url);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'rawQuery',
+          name: 'listCalendarAvailability',
+          fileNamePattern: /.*services[\\\/]availability\.js/
+        });
+    });
+
+    /**
+     * Assert availability
+     * @param {Object} responseAvailabilities - Response
+     * @param {Object} expectedAvailabilities - Stored data
+     */
+    function assertCalendarAvailability(responseAvailabilities, expectedAvailabilities) {
+      const propertiesToOmit = ['createdDate', 'editDate'];
+      _.forEach(responseAvailabilities, (availabilities, day) => {
+        availabilities = availabilities.map(availability => _.omit(availability, propertiesToOmit));
+
+        if (expectedAvailabilities[day]) {
+          const storedAvailabilities = _.orderBy(expectedAvailabilities[day], 'startTime');
+
+          expect(availabilities).to.have.deep.members(storedAvailabilities);
+        } else {
+          expect(availabilities.length).to.eql(0);
+        }
+      });
+
+    }
+
+    /**
+     * Creates an availability and return formatted response
+     * @param {string} scheduleSid - Availability will be added under this schedule
+     * @param {string} startDate - Start date of availability
+     * @param {string} [endDate] - end date of availability
+     * @returns {Object} - Formatted response
+     */
+    function* createAvailability(scheduleSid, startDate, endDate) {
+      const omittedField = [
+        'id',
+        'isDeleted',
+        'systemModstamp',
+        'schedule',
+        'lastModifiedDate',
+        'createdDate',
+        'editDate'
+      ];
+      endDate = endDate || moment(startDate).add(1, 'd').utc().format('YYYY-MM-DD');
+
+      const dayOfWeek = moment(startDate).days();
+      const payload = {
+        scheduleSid,
+        startDate: startDate,
+        endDate: endDate,
+        startTime: moment().utc().format('HH:mm'),
+        endTime: moment().utc().format('HH:mm'),
+        recurring: null,
+        dayOfWeek: dayOfWeek
+      };
+
+      let availability = yield populate.availability.addDefault(payload);
+      availability = availability.dataValues;
+      availability.createdDate = availability.createdDate.toISOString();
+      availability.editDate = availability.lastModifiedDate.toISOString();
+      return _.omit(availability, omittedField);
+    }
+
+    /**
+     * Add a desired number of seats to a calendar
+     * @param {string} calendarSid - Sid of calendar
+     * @param {string} locationSid - Location for seat
+     * @param {string} scheduleSid - Schedule for seat
+     * @param {number} numberOfSeats - Number of seats to add
+     */
+    function* createCalendarSeats(calendarSid, locationSid, scheduleSid, numberOfSeats = 1) {
+      for (let i = 0; i < numberOfSeats; i++) {
+        const seatSid = (yield  populate.seat.addDefault({
+          scheduleSid,
+          schedulingLocationSid: locationSid,
+          title: i
+        })).sid;
+        yield  populate.calendarSeat.addDefault({calendarSid, seatSid});
+      }
+    }
+
+
+  });
+
 });
 
 /**
@@ -700,6 +957,6 @@ function* createAccountAndSchedule() {
   const locationSid = (yield populate.location.addDefault({schedulingAccountSid: accountSid})).sid;
   const calendarSid = (yield populate.calendar.addDefault({schedulingLocationSid: locationSid})).sid;
   const scheduleSid = (yield populate.schedule.addDefault({calendarSid})).sid;
-  return {accountSid, scheduleSid};
+  return {accountSid, scheduleSid, calendarSid, locationSid};
 }
 
