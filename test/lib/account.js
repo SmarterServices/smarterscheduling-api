@@ -19,7 +19,7 @@ describe('Accounts', function testAccounts() {
     const url = endpoints.account.post;
     const omittedField = ['sid', 'editDate', 'createdDate'];
 
-    it('Should Add account successfully and return 200 response', function () {
+    it('Should Add account successfully with no [sid] in [payload] and return 200 response', function () {
       const payload = _.cloneDeep(accountData.post.payload.valid);
 
       return common
@@ -32,6 +32,55 @@ describe('Accounts', function testAccounts() {
           accounts.push(result);
 
           expect(_.omit(result, omittedField)).to.eql(payload);
+        });
+
+    });
+
+    it('Should Add account with [sid] in [payload] having prefix [PA] and return 200 response', function () {
+      const payload = _.cloneDeep(accountData.post.payload.valid);
+      payload.sid = common.makeGenericSid('PA');
+
+      return common
+        .request
+        .post(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          accounts.push(result);
+          expect(_.omit(result, omittedField)).to.eql(_.omit(payload, omittedField));
+        });
+
+    });
+
+    it('Should Add account with [sid] in [payload] having prefix [SA] and return 200 response', function () {
+      const payload = _.cloneDeep(accountData.post.payload.valid);
+      payload.sid = common.makeGenericSid('SA');
+
+      return common
+        .request
+        .post(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          accounts.push(result);
+          expect(_.omit(result, omittedField)).to.eql(_.omit(payload, omittedField));
+        });
+
+    });
+
+    it('Should not Add account for existing [sid] in [payload] and return 404 response', function () {
+      const payload = _.cloneDeep(accountData.post.payload.valid);
+      payload.sid = accounts[0].sid;
+
+      return common
+        .request
+        .post(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('SID_ALREADY_EXISTS', response);
         });
 
     });
@@ -78,6 +127,19 @@ describe('Accounts', function testAccounts() {
         .testDatabaseFailure({
           request,
           type: 'addData',
+          name: 'account'
+        });
+    });
+
+    it('Should fail for database failure of [getAccount] and return 400 response', function () {
+      const payload = _.cloneDeep(accountData.post.payload.valid);
+      payload.sid = accounts[0].sid;
+      const request = common.request.post(url).send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'getData',
           name: 'account'
         });
     });
@@ -138,6 +200,7 @@ describe('Accounts', function testAccounts() {
   describe('LIST Appointment Availability', function () {
     let accountSid;
     let accountSid1;
+    let accountSid2;
     let calendarSid;
     let calendarSid1;
     let locationSid;
@@ -151,6 +214,7 @@ describe('Accounts', function testAccounts() {
     before('PopulateData', function* () {
       accountSid = (yield common.populate.account.addDefault()).sid;
       accountSid1 = (yield common.populate.account.addDefault()).sid;
+      accountSid2 = (yield common.populate.account.addDefault({sid: common.makeGenericSid('PA')})).sid;
       locationSid = (yield common.populate.location.addDefault({
         schedulingAccountSid: accountSid
       })).sid;
@@ -193,6 +257,34 @@ describe('Accounts', function testAccounts() {
             expect(appointment.duration).to.equal(query.duration);
           }
         });
+    });
+
+    it('Should list successfully for [PA prefixed] [account] and return 200 response', function* () {
+      const query = {
+        calendarSid,
+        startDateTime,
+        endDateTime,
+        duration
+      };
+      const url = common.buildUrl(urlTemplate, {accountSid: accountSid2}, query);
+
+      //Changing the accountSid of the location to a 'PA' prefixed account
+      yield common.populate.location.update({schedulingAccountSid: accountSid2}, {sid: locationSid});
+
+      yield common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result.results;
+          expect(result.length).to.eql(TOTAL_AVAILABILITY);
+          for (const appointment of result) {
+            expect(appointment.duration).to.equal(query.duration);
+          }
+        });
+
+      // Reverting back the changes of the location
+      yield common.populate.location.update({schedulingAccountSid: accountSid}, {sid: locationSid});
     });
 
     // TODO: Test should be updated in future, since for different calendarSid response will be different

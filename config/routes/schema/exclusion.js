@@ -6,14 +6,14 @@ const schema = {
       .object({
         accountSid: joi
           .string()
-          .regex(/^SA[a-f0-9]{32}$/, 'Account Sid')
+          .regex(/^(SA)|(PA)[a-f0-9]{32}$/, 'Account Sid')
           .required()
           .description('Account Sid')
       }),
     payload: joi.object({
       locationSid: joi
         .string()
-        .regex(/^SL[a-f0-9]{32}$/)
+        .regex(/^(SL)|(PL)[a-f0-9]{32}$/)
         .allow(null)
         .description('Scheduling Location Sid'),
       scheduleSid: joi
@@ -91,7 +91,7 @@ const schema = {
       .object({
         accountSid: joi
           .string()
-          .regex(/^SA[a-f0-9]{32}$/, 'Account Sid')
+          .regex(/^(SA)|(PA)[a-f0-9]{32}$/, 'Account Sid')
           .required()
           .description('Account Sid'),
 
@@ -172,14 +172,14 @@ const schema = {
       .object({
         accountSid: joi
           .string()
-          .regex(/^SA[a-f0-9]{32}$/, 'Account Sid')
+          .regex(/^(SA)|(PA)[a-f0-9]{32}$/, 'Account Sid')
           .required()
           .description('Account Sid')
       }),
     query: {
       locationSid: joi
         .string()
-        .regex(/^SL[a-f0-9]{32}$/)
+        .regex(/^(SL)|(PL)[a-f0-9]{32}$/)
         .description('Scheduling Location Sid'),
       scheduleSid: joi
         .string()

@@ -9,12 +9,12 @@ const schema = {
       .object({
         accountSid: joi
           .string()
-          .regex(/^SA[a-f0-9]{32}$/, 'Account Sid')
+          .regex(/^(SA)|(PA)[a-f0-9]{32}$/, 'Account Sid')
           .required()
           .description('Account Sid'),
         locationSid: joi
           .string()
-          .regex(/^SL[a-f0-9]{32}$/, 'Location Sid')
+          .regex(/^(SL)|(PL)[a-f0-9]{32}$/, 'Location Sid')
           .required()
           .description('Location Sid')}),
     payload:joi.object({
@@ -51,12 +51,12 @@ const schema = {
       .object({
         accountSid: joi
           .string()
-          .regex(/^SA[a-f0-9]{32}$/, 'Account Sid')
+          .regex(/^(SA)|(PA)[a-f0-9]{32}$/, 'Account Sid')
           .required()
           .description('Account Sid'),
         locationSid: joi
           .string()
-          .regex(/^SL[a-f0-9]{32}$/, 'Location Sid')
+          .regex(/^(SL)|(PL)[a-f0-9]{32}$/, 'Location Sid')
           .required()
           .description('Location Sid'),
         calendarSid: joi
@@ -70,12 +70,12 @@ const schema = {
       .object({
         accountSid: joi
           .string()
-          .regex(/^SA[a-f0-9]{32}$/, 'Account Sid')
+          .regex(/^(SA)|(PA)[a-f0-9]{32}$/, 'Account Sid')
           .required()
           .description('Account Sid'),
         locationSid: joi
           .string()
-          .regex(/^SL[a-f0-9]{32}$/, 'Location Sid')
+          .regex(/^(SL)|(PL)[a-f0-9]{32}$/, 'Location Sid')
           .required()
           .description('Location Sid'),
         calendarSid: joi
@@ -135,13 +135,13 @@ const schema = {
       .object({
         accountSid: joi
           .string()
-          .regex(/^SA[a-f0-9]{32}$/, 'Account Sid')
+          .regex(/^(SA)|(PA)[a-f0-9]{32}$/, 'Account Sid')
           .required()
           .description('Account Sid'),
 
         locationSid: joi
           .string()
-          .regex(/^SL[a-f0-9]{32}$/, 'Location Sid')
+          .regex(/^(SL)|(PL)[a-f0-9]{32}$/, 'Location Sid')
           .required()
           .description('Location Sid')}),
     query: {
