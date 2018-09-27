@@ -12,14 +12,23 @@ const Op = Sequelize.Op;
 
 describe('Calendar', function testCalendar() {
   const calendars = [];
+  // Calendars for 'PA' prefixed account and 'PL' prefixed location
+  const calendars1 = [];
   let accountSid;
+  // Account Sid having prefix 'PA'
+  let accountSid1;
   let locationSid;
+  // Location Sid having prefix 'PL'
+  let locationSid1;
   let locationSid2;
   let sandbox;
 
   before('Populate Data', function* () {
     const account = yield common.populate.account.addDefault();
     accountSid = account.sid;
+    accountSid1 = (yield common.populate.account.addDefault({
+      sid: common.makeGenericSid('PA')
+    })).sid;
     const location = yield common.populate.location.addDefault({
       schedulingAccountSid: accountSid
     });
@@ -27,6 +36,10 @@ describe('Calendar', function testCalendar() {
       schedulingAccountSid: accountSid
     })).sid;
     locationSid = location.sid;
+    locationSid1 = (yield common.populate.location.addDefault({
+      sid: common.makeGenericSid('PL'),
+      schedulingAccountSid: accountSid1
+    })).sid;
   });
 
   after('Clean Data', function* () {
@@ -57,6 +70,32 @@ describe('Calendar', function testCalendar() {
           expect(result.schedule.interval).to.equal(10);
           expect(result.schedule.endBuffer).to.equal(0);
           calendars.push(result);
+        });
+    });
+
+    it('Should Add calendar under [PA prefixed] [account] and [PL prefixed] [location] return 200 response', function () {
+      const payload = _.cloneDeep(calendarData.post.payload.valid);
+      const params = {
+        accountSid: accountSid1,
+        locationSid: locationSid1
+      };
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .post(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(response.statusCode).to.equal(200);
+          expect(result.title).to.equal(payload.title);
+          expect(result.locationSid).to.equal(locationSid1);
+          // Default value of interval is 10 and for endBuffer 0
+          expect(result.schedule.interval).to.equal(10);
+          expect(result.schedule.endBuffer).to.equal(0);
+          //Result is pushed to calendars1 array because of different locationSid
+          calendars1.push(result);
         });
     });
 
@@ -297,6 +336,26 @@ describe('Calendar', function testCalendar() {
         });
     });
 
+    it('Should List calendar for [PA prefixed] [account] and [PL prefixed] [location] and return 200 response', function () {
+      const params = {
+        accountSid: accountSid1,
+        locationSid: locationSid1
+      };
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(result.total).to.eql(calendars1.length);
+          expect(result.count).to.eql(calendars1.length);
+          expect(result.results).to.eql(calendars1);
+          expect(response.statusCode).to.equal(200);
+        });
+    });
+
     it('Should List empty calendar for different [locationSid] and return 200 response', function () {
       const params = {accountSid, locationSid: locationSid2};
       const url = common.buildUrl(urlTemplate, params);
@@ -420,6 +479,26 @@ describe('Calendar', function testCalendar() {
           const result = response.result;
           expect(response.statusCode).to.eql(200);
           expect(result).to.eql(calendars[0]);
+        });
+    });
+
+    it('Should get calendar for [PA prefixed] [account] and [PL prefixed] [location] and return 200 response', function () {
+      const calendarSid = calendars1[0].sid;
+      const params = {
+        calendarSid,
+        accountSid: accountSid1,
+        locationSid: locationSid1
+      };
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(response.statusCode).to.eql(200);
+          expect(result).to.eql(calendars1[0]);
         });
     });
 
@@ -606,6 +685,29 @@ describe('Calendar', function testCalendar() {
           expect(response.statusCode).to.equal(200);
 
           assertCalendarData(payload, calendars[0], result);
+        });
+    });
+
+    it('Should update calendar for [PA prefixed] [account] and [PL prefixed] [location] and return 200 response', function () {
+      const calendarSid = calendars1[0].sid;
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {
+        calendarSid,
+        accountSid: accountSid1,
+        locationSid: locationSid1,
+      };
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .put(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(response.statusCode).to.equal(200);
+
+          assertCalendarData(payload, calendars1[0], result);
         });
     });
 

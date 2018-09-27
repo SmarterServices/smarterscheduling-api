@@ -10,16 +10,26 @@ const endpoints = require('./../data/endpoints.json');
 
 describe('Availability', function testAccounts() {
   let accountSid;
+  //PA prefixed account
+  let accountSid1;
   let accountSid2;
   let accountSid3;
   let scheduleSid;
+  let scheduleSid1;
   let scheduleSid2;
   let scheduleSid3;
+  // Availabilities for PA prefixed account
+  let availabilities1 = [];
 
   before('PopulateData', function* () {
+
     const addedSids = yield createAccountAndSchedule();
     accountSid = addedSids.accountSid;
     scheduleSid = addedSids.scheduleSid;
+
+    const addedSids1 = yield createAccountAndSchedule('PA');
+    accountSid1 = addedSids1.accountSid;
+    scheduleSid1 = addedSids1.scheduleSid;
 
     const addedSids2 = yield createAccountAndSchedule();
     accountSid2 = addedSids2.accountSid;
@@ -65,6 +75,35 @@ describe('Availability', function testAccounts() {
           expect(availabilityList.length).to.eql(2);
           for (let index = 0; index < availabilityList.length; index++) {
             assertSuccessResponse(availabilityList[index], payload.create[index], {scheduleSid});
+          }
+        });
+    });
+
+    it('Should Add availability for [PA prefixed] [account] and return 200 response', function () {
+      const payload = getPayload(['create']);
+      payload.create.push(payload.create[0]);
+
+      setDynamicDate(payload.create);
+      const url = common.buildUrl(urlTemplate, {
+        accountSid: accountSid1,
+        scheduleSid: scheduleSid1
+      });
+
+      return common
+        .request
+        .post(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+
+          expect(response.statusCode).to.eql(200);
+          const availabilityList = result.results;
+          availabilities1 = availabilityList;
+
+          expect(availabilityList.length).to.eql(2);
+          for (let index = 0; index < availabilityList.length; index++) {
+            assertSuccessResponse(availabilityList[index], payload.create[index], {scheduleSid: scheduleSid1});
           }
         });
     });
@@ -517,6 +556,8 @@ describe('Availability', function testAccounts() {
     before('PopulateData', function* () {
       const availability = yield createAvailability(scheduleSid2);
       availabilities.push(availability);
+      const availability1 = yield createAvailability(scheduleSid1);
+      availabilities1.push(availability1);
       const availability2 = yield createAvailability(scheduleSid2);
       availabilities.push(availability2);
       const availability3 = yield createAvailability(scheduleSid2);
@@ -541,6 +582,27 @@ describe('Availability', function testAccounts() {
           expect(result.count).to.eql(availabilities.length);
           expect(result.results.length).to.eql(availabilities.length);
           expect(result.results).to.have.deep.members(availabilities);
+        });
+    });
+
+    it('Should list availability for [PA prefixed] [account] and return 200 response', function () {
+      const url = common.buildUrl(urlTemplate, {
+        accountSid: accountSid1,
+        scheduleSid: scheduleSid1
+      });
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+
+          expect(response.statusCode).to.eql(200);
+          expect(result.total).to.eql(availabilities1.length);
+          expect(result.count).to.eql(availabilities1.length);
+          expect(result.results.length).to.eql(availabilities1.length);
+          expect(result.results).to.have.deep.members(availabilities1);
         });
     });
 
@@ -693,10 +755,13 @@ describe('Availability', function testAccounts() {
 
 /**
  * Creates account to schedule with proper join
+ * @param {string} accountSidPrefix - Prefix of account sid
  * @returns {Object} - Sid of account and schedule
  */
-function* createAccountAndSchedule() {
-  const accountSid = (yield populate.account.addDefault()).sid;
+function* createAccountAndSchedule(accountSidPrefix) {
+  const accountSid = accountSidPrefix
+    ? (yield populate.account.addDefault({sid: common.makeGenericSid(accountSidPrefix)})).sid
+    : (yield populate.account.addDefault()).sid;
   const locationSid = (yield populate.location.addDefault({schedulingAccountSid: accountSid})).sid;
   const calendarSid = (yield populate.calendar.addDefault({schedulingLocationSid: locationSid})).sid;
   const scheduleSid = (yield populate.schedule.addDefault({calendarSid})).sid;

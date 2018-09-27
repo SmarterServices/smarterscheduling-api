@@ -6,6 +6,10 @@ const utils = require('./../../../lib/helpers/utils');
 const schema = {
   add: {
     payload: joi.object({
+      sid: joi
+        .string()
+        .regex(/^(SA)|(PA)[a-f0-9]{32}$/, 'accountSid')
+        .description('Sid of the account'),
       title: joi
         .string()
         .required()
@@ -115,7 +119,7 @@ const schema = {
       .object({
         accountSid: joi
           .string()
-          .regex(/^SA[a-f0-9]{32}$/, 'accountSid')
+          .regex(/^(SA)|(PA)[a-f0-9]{32}$/, 'accountSid')
           .required()
           .description('Account Sid')
       }),

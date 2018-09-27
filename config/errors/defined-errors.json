@@ -92,5 +92,10 @@
     "code": "1211",
     "message": "One Availability between '%availabilitySid%' not found",
     "status": 404
+  },
+  "SID_ALREADY_EXISTS": {
+    "code": "1212",
+    "message": "Sid '%sid%' already exists",
+    "status": 404
   }
 }

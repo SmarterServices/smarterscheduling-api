@@ -9,14 +9,19 @@ const endpoints = require('./../data/endpoints.json');
 
 describe('Exclusions', function testAccounts() {
   let accountSid;
+  // PA prefixed account
+  let accountSid1;
   let accountSid2;
   let locationSid;
   let scheduleSid;
   const exclusions = [];
+  // Exclusions under PA prefixed account
+  const exclusions1 = [];
 
   before('PopulateData', function* () {
 
     accountSid = (yield common.populate.account.addDefault()).sid;
+    accountSid1 = (yield common.populate.account.addDefault({sid: common.makeGenericSid('PA')})).sid;
     accountSid2 = (yield common.populate.account.addDefault()).sid;
     locationSid = (yield common.populate.location.addDefault({schedulingAccountSid: accountSid})).sid;
 
@@ -49,6 +54,24 @@ describe('Exclusions', function testAccounts() {
           assertAddedData(result, payload, {accountSid});
         });
 
+    });
+
+    it('Should Add exclusion for [PA prefixed] [account] and return 200 response', function () {
+      const payload = _.cloneDeep(exclusionData.post.payload.valid);
+      const url = common.buildUrl(urlTemplate, {
+        accountSid: accountSid1
+      });
+
+      return common
+        .request
+        .post(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          exclusions1.push(result);
+          assertAddedData(result, payload, {accountSid: accountSid1});
+        });
     });
 
     it('Should Add exclusion with [locationSid] successfully and return 200 response', function () {
@@ -283,6 +306,25 @@ describe('Exclusions', function testAccounts() {
 
     });
 
+    it('Should get exclusion details for valid [PA prefixed] [accountSid] with 200 response', function () {
+      const url = common.buildUrl(urlTemplate, {
+        accountSid: accountSid1,
+        exclusionSid: exclusions1[0].sid
+      });
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+
+          expect(response.statusCode).to.equal(200);
+          expect(result).to.eql(exclusions1[0]);
+        });
+
+    });
+
 
     it('Should fail for invalid [exclusionSid] with 404 response', function () {
       const url = common.buildUrl(urlTemplate, {accountSid, exclusionSid: common.makeGenericSid('AE')});
@@ -342,6 +384,21 @@ describe('Exclusions', function testAccounts() {
           expect(result.total).to.eql(exclusions.length);
           expect(result.count).to.eql(exclusions.length);
           expect(result.results).to.eql(exclusions);
+        });
+    });
+
+    it('Should list successfully for [PA prefixed] [account] and return 200 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid: accountSid1});
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(response.statusCode).to.eql(200);
+          expect(result.total).to.eql(exclusions1.length);
+          expect(result.count).to.eql(exclusions1.length);
+          expect(result.results).to.eql(exclusions1);
         });
     });
 
@@ -472,6 +529,26 @@ describe('Exclusions', function testAccounts() {
 
     });
 
+    it('Should update for valid [PA prefixed] [accountSid] with 200 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid: accountSid1, exclusionSid: exclusions1[0].sid});
+      const payload = _.cloneDeep(exclusionData.update.payload.valid);
+      const fieldsToIgnore = ['editDate'];
+
+      return common
+        .request
+        .put(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          const updatePayload = Object.assign({}, exclusions1[0], payload);
+
+          expect(response.statusCode).to.equal(200);
+          expect(_.omit(result, fieldsToIgnore)).to.eql(_.omit(updatePayload, fieldsToIgnore));
+        });
+
+    });
+
 
     it('Should fail for invalid [exclusionSid] with 404 response', function () {
       const url = common.buildUrl(urlTemplate, {accountSid, exclusionSid: common.makeGenericSid('AE')});
@@ -558,7 +635,7 @@ describe('Exclusions', function testAccounts() {
   });
 
   describe('DELETE', function () {
-    const urlTemplate = endpoints.exclusion.update;
+    const urlTemplate = endpoints.exclusion.delete;
 
     it('Should delete successfully with 200 response', function* () {
       const exclusionSid = exclusions[0].sid;
@@ -581,7 +658,33 @@ describe('Exclusions', function testAccounts() {
       const listAfterDelete = yield common.populate.exclusion.list();
       expect(listAfterDelete.length).to.eql(listBeforeDelete.length - 1);
 
-      for(const exclusion of listAfterDelete) {
+      for (const exclusion of listAfterDelete) {
+        expect(exclusion.sid).to.not.eql(exclusionSid);
+      }
+    });
+
+    it('Should delete for [PA prefixed] [account] with 200 response', function* () {
+      const exclusionSid = exclusions1[0].sid;
+      const url = common.buildUrl(urlTemplate, {accountSid: accountSid1, exclusionSid});
+
+      const listBeforeDelete = yield common.populate.exclusion.list();
+
+      yield common
+        .request
+        .delete(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+
+          expect(response.statusCode).to.equal(200);
+          expect(result).to.eql({success: 'OK'});
+        });
+
+      //check that correct row has been deleted
+      const listAfterDelete = yield common.populate.exclusion.list();
+      expect(listAfterDelete.length).to.eql(listBeforeDelete.length - 1);
+
+      for (const exclusion of listAfterDelete) {
         expect(exclusion.sid).to.not.eql(exclusionSid);
       }
     });
