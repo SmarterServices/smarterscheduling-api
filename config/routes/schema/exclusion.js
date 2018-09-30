@@ -77,11 +77,12 @@ const schema = {
       .object({
         accountSid: joi
           .string()
+          .regex(/^(SA)|(PA)[a-f0-9]{32}$/, 'Account Sid')
           .required()
           .description('Account Sid'),
-
         exclusionSid: joi
           .string()
+          .regex(/^AE[a-f0-9]{32}$/, 'Exclusion Sid')
           .required()
           .description('Exclusion Sid')
       })
@@ -94,7 +95,6 @@ const schema = {
           .regex(/^(SA)|(PA)[a-f0-9]{32}$/, 'Account Sid')
           .required()
           .description('Account Sid'),
-
         exclusionSid: joi
           .string()
           .regex(/^AE[a-f0-9]{32}$/, 'Exclusion Sid')
@@ -158,11 +158,12 @@ const schema = {
       .object({
         accountSid: joi
           .string()
+          .regex(/^(SA)|(PA)[a-f0-9]{32}$/, 'Account Sid')
           .required()
           .description('Account Sid'),
-
         exclusionSid: joi
           .string()
+          .regex(/^AE[a-f0-9]{32}$/, 'Exclusion Sid')
           .required()
           .description('Exclusion Sid')
       })
