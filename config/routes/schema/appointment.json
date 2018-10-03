@@ -9,5 +9,16 @@
   "seat": "seat",
   "seatRSid": "seatRSid",
   "calendar": "calendar",
-  "calendarRSid": "calendarRSid"
+  "calendarRSid": "calendarRSid",
+  "startDate": "startDate",
+  "endDate": "endDate",
+  "externalId": "externalId",
+  "externalSystem": "externalSystem",
+  "firstName": "firstName",
+  "lastName": "lastName",
+  "email": "email",
+  "phone": "phone",
+  "notes": "notes",
+  "metadata": "metadata",
+  "internalNotes": "internalNotes"
 }

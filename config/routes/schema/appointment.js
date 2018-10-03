@@ -9,12 +9,7 @@ const schema = {
         accountSid: joi
           .string()
           .required()
-          .description('Account Sid'),
-
-        scheduleSid: joi
-          .string()
-          .required()
-          .description('Schedule Sid')
+          .description('Account Sid')
       }),
     payload: joi.object({
       id: joi
@@ -56,7 +51,51 @@ const schema = {
       calendarRSid: joi
         .any()
         .required()
-        .description('Calendar R Sid')
+        .description('Calendar R Sid'),
+      startDate: joi
+        .date()
+        .required()
+        .description('Start Date'),
+      endDate: joi
+        .date()
+        .required()
+        .description('End Date'),
+      externalId: joi
+        .string()
+        .allow(null)
+        .description('External ID'),
+      externalSystem: joi
+        .string()
+        .allow(null)
+        .description('External System'),
+      firstName: joi
+        .string()
+        .required()
+        .description('First Name'),
+      lastName: joi
+        .string()
+        .required()
+        .description('Last Name'),
+      email: joi
+        .string()
+        .required()
+        .description('Email'),
+      phone: joi
+        .string()
+        .allow(null)
+        .description('Phone'),
+      notes: joi
+        .string()
+        .allow(null)
+        .description('Notes'),
+      metadata: joi
+        .string()
+        .allow(null)
+        .description('Metadata'),
+      internalNotes: joi
+        .string()
+        .allow(null)
+        .description('Internal Notes')
     })
       .required()
       .description('Appointment payload')
@@ -68,11 +107,6 @@ const schema = {
           .string()
           .required()
           .description('Account Sid'),
-
-        scheduleSid: joi
-          .string()
-          .required()
-          .description('Schedule Sid'),
 
         appointmentSid: joi
           .string()
@@ -88,11 +122,6 @@ const schema = {
           .required()
           .description('Account Sid'),
 
-        scheduleSid: joi
-          .string()
-          .required()
-          .description('Schedule Sid'),
-
         appointmentSid: joi
           .string()
           .required()
@@ -138,7 +167,51 @@ const schema = {
       calendarRSid: joi
         .any()
         .required()
-        .description('Calendar R Sid')
+        .description('Calendar R Sid'),
+      startDate: joi
+        .date()
+        .required()
+        .description('Start Date'),
+      endDate: joi
+        .date()
+        .required()
+        .description('End Date'),
+      externalId: joi
+        .string()
+        .allow(null)
+        .description('External ID'),
+      externalSystem: joi
+        .string()
+        .allow(null)
+        .description('External System'),
+      firstName: joi
+        .string()
+        .required()
+        .description('First Name'),
+      lastName: joi
+        .string()
+        .required()
+        .description('Last Name'),
+      email: joi
+        .string()
+        .required()
+        .description('Email'),
+      phone: joi
+        .string()
+        .allow(null)
+        .description('Phone'),
+      notes: joi
+        .string()
+        .allow(null)
+        .description('Notes'),
+      metadata: joi
+        .string()
+        .allow(null)
+        .description('Metadata'),
+      internalNotes: joi
+        .string()
+        .allow(null)
+        .description('Internal Notes')
     })
       .required()
       .description('Appointment payload')
@@ -150,11 +223,6 @@ const schema = {
           .string()
           .required()
           .description('Account Sid'),
-
-        scheduleSid: joi
-          .string()
-          .required()
-          .description('Schedule Sid'),
 
         appointmentSid: joi
           .string()
@@ -168,12 +236,7 @@ const schema = {
         accountSid: joi
           .string()
           .required()
-          .description('Account Sid'),
-
-        scheduleSid: joi
-          .string()
-          .required()
-          .description('Schedule Sid')
+          .description('Account Sid')
       }),
     query: {
       offset: joi
