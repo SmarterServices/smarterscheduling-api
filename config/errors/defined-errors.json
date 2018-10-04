@@ -102,5 +102,9 @@
     "code": "1213",
     "message": "Calendar'%calendarSid%' not found",
     "status": 404
+  },
+  "APPOINTMENT_CREATION_FAILED": {
+    "code": "1214",
+    "message": "Appointment insertion failed due to inadequate seat or data"
   }
 }

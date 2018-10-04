@@ -35,16 +35,21 @@ const schema = {
         .number()
         .integer()
         .positive()
+        .required()
         .description('Duration of Exam'),
       externalId: joi
         .string()
         .allow(null, '')
         .max(255)
+        .empty('')
+        .default(null)
         .description('External ID'),
       externalSystem: joi
         .string()
         .allow(null, '')
         .max(255)
+        .empty('')
+        .default(null)
         .description('External System'),
       firstName: joi
         .string()
@@ -61,15 +66,20 @@ const schema = {
       phone: joi
         .string()
         .allow(null, '')
+        .empty('')
+        .default(null)
         .description('Phone'),
       notes: joi
         .string()
         .allow(null, '')
+        .empty('')
+        .default(null)
         .description('Notes'),
       metadata: joi
         .object()
         .options({allowUnknown: true, stripUnknown: false})
         .raw()
+        .empty('')
         .default(null)
         .description('Metadata')
     })
@@ -155,12 +165,10 @@ const schema = {
       externalId: joi
         .string()
         .allow(null)
-        .default(null)
         .description('External ID'),
       externalSystem: joi
         .string()
         .allow(null)
-        .default(null)
         .description('External System'),
       firstName: joi
         .string()
@@ -177,12 +185,10 @@ const schema = {
       phone: joi
         .string()
         .allow(null)
-        .default(null)
         .description('Phone'),
       notes: joi
         .string()
         .allow(null)
-        .default(null)
         .description('Notes'),
       metadata: joi
         .string()
