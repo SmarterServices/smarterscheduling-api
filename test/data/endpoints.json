@@ -2,6 +2,7 @@
   "account": {
     "post": "v1/accounts",
     "list": "v1/accounts",
+    "get": "v1/accounts/{accountSid}",
     "listAppointmentAvailability": "v1/accounts/{accountSid}/availability"
   },
   "availability": {
@@ -24,6 +25,7 @@
   },
   "location": {
     "post": "v1/accounts/{accountSid}/locations",
-    "list": "v1/accounts/{accountSid}/locations"
+    "list": "v1/accounts/{accountSid}/locations",
+    "get": "v1/accounts/{accountSid}/locations/{locationSid}"
   }
 }

@@ -61,6 +61,7 @@ const schema = {
         .description('The last name of the person making the reservation'),
       email: joi
         .string()
+        .email()
         .required()
         .description('Email'),
       phone: joi
@@ -77,10 +78,18 @@ const schema = {
         .description('Notes'),
       metadata: joi
         .object()
-        .options({allowUnknown: true, stripUnknown: false})
         .raw()
         .empty('')
         .default(null)
+        .options({
+          allowUnknown: true,
+          stripUnknown: false,
+          language: {
+            object: {
+              base: '!!metadata must be an string' //Throw custom error
+            }
+          }
+        })
         .description('Metadata')
     })
       .required()

@@ -6,7 +6,7 @@ const utils = require('./../../lib/helpers/utils');
 
 module.exports = [{
   method: 'POST',
-  path: '/accounts/{accountSid}/appointments',
+  path: '/v1/accounts/{accountSid}/appointments',
   config: {
     handler: function (request, reply) {
 
