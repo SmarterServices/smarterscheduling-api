@@ -106,5 +106,10 @@
   "APPOINTMENT_CREATION_FAILED": {
     "code": "1214",
     "message": "Appointment insertion failed due to inadequate seat or data"
+  },
+  "APPOINTMENT_NOT_FOUND": {
+    "code": "1215",
+    "message": "Appointment '%appointmentSid%' not found",
+    "status": 404
   }
 }

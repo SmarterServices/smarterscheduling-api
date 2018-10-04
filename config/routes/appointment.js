@@ -67,19 +67,20 @@ module.exports = [{
       query: appointmentSchema.list.query
     }
   }
-}, {
+}*/, {
   method: 'GET',
-  path: '/v1/accounts/{accountSid}/schedules/{scheduleSid}/appointments/{appointmentSid}',
+  path: '/v1/accounts/{accountSid}/appointments/{appointmentSid}',
   config: {
     handler: function (request, reply) {
 
       const opts = {
-        params: request.params
+        params: request.params,
+        paramValidationResult: request.paramValidationResult
       };
 
       appointmentHandler.getAppointment(opts, function (err, r) {
         if (err) {
-          reply(Boom.badRequest(err));
+          errorResponse.formatError(err, null, reply);
         } else {
           utils.replyJson('partials/appointment', {appointment: r}, reply);
         }
@@ -89,9 +90,18 @@ module.exports = [{
     description: 'Get appointment',
     validate: {
       params: appointmentSchema.get.params
+    },
+    plugins: {
+      paramValidate: [{
+        relationName: 'account',
+        primaryKey: 'accountSid'
+      }, {
+        relationName: 'appointment',
+        primaryKey: 'appointmentSid'
+      }]
     }
   }
-}, {
+}/*, {
   method: 'PUT',
   path: '/v1/accounts/{accountSid}/schedules/{scheduleSid}/appointments/{appointmentSid}',
   config: {

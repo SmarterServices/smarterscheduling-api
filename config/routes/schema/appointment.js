@@ -91,11 +91,12 @@ const schema = {
       .object({
         accountSid: joi
           .string()
+          .regex(/^(SA)|(PA)[a-f0-9]{32}$/, 'Account Sid')
           .required()
           .description('Account Sid'),
-
         appointmentSid: joi
           .string()
+          .regex(/^SP[a-f0-9]{32}$/, 'Appointment Sid')
           .required()
           .description('Appointment Sid')
       })
