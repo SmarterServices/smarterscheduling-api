@@ -74,31 +74,44 @@ module.exports = [{
       }
     }
   }
-}/*, {
+}, {
   method: 'GET',
   path: '/v1/accounts/{accountSid}/locations/{locationSid}',
   config: {
     handler: function (request, reply) {
 
-      const opts = {
+      //Location data comes from param validation plugin so, no need to call handler
+      utils.replyJson('partials/location', {location: request.paramValidationResult.location}, reply);
+
+      /*const opts = {
         params: request.params
       };
 
       locationHandler.getLocation(opts, function (err, r) {
         if (err) {
-          reply(err);
+          errorResponse.formatError(err, null, reply);
         } else {
           utils.replyJson('partials/location', {location: r}, reply);
         }
-      });
+      });*/
     },
     tags: ['api', 'Location'],
     description: 'Get location',
     validate: {
       params: locationSchema.get.params
+    },
+    plugins: {
+      paramValidate: {
+        relationName: 'location',
+        primaryKey: 'locationSid',
+        parent: {
+          relationName: 'account',
+          primaryKey: 'accountSid'
+        }
+      }
     }
   }
-}, {
+}, /*{
   method: 'PUT',
   path: '/v1/accounts/{accountSid}/locations/{locationSid}',
   config: {

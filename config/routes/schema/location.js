@@ -41,11 +41,13 @@ let schema = {
       .object({
         accountSid: joi
           .string()
+          .regex(/^(SA)|(PA)[a-f0-9]{32}$/, 'accountSid')
           .required()
           .description('Account Sid'),
 
         locationSid: joi
           .string()
+          .regex(/^(SL)|(PL)[a-f0-9]{32}$/, 'locationSid')
           .required()
           .description('Location Sid')
       })
