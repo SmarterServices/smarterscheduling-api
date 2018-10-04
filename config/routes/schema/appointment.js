@@ -61,6 +61,7 @@ const schema = {
         .description('The last name of the person making the reservation'),
       email: joi
         .string()
+        .email()
         .required()
         .description('Email'),
       phone: joi
