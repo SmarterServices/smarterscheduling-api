@@ -1,13 +1,12 @@
 'use strict';
 
 const appointmentSchema = require('./schema/appointment');
-
 const appointmentHandler = require('./../../lib/handlers/appointment');
 const utils = require('./../../lib/helpers/utils');
 
-module.exports = [/*{
+module.exports = [{
   method: 'POST',
-  path: '/v1/accounts/{accountSid}/schedules/{scheduleSid}/appointments',
+  path: '/v1/accounts/{accountSid}/appointments',
   config: {
     handler: function (request, reply) {
 
@@ -18,7 +17,7 @@ module.exports = [/*{
 
       appointmentHandler.addAppointment(opts, function (err, r) {
         if (err) {
-          reply(Boom.badRequest(err));
+          errorResponse.formatError(err, null, reply);
         } else {
           utils.replyJson('partials/appointment', {appointment: r}, reply);
         }
@@ -29,9 +28,15 @@ module.exports = [/*{
     validate: {
       params: appointmentSchema.add.params,
       payload: appointmentSchema.add.payload
+    },
+    plugins: {
+      paramValidate: {
+        relationName: 'account',
+        primaryKey: 'accountSid'
+      }
     }
   }
-}, {
+}/*, {
   method: 'GET',
   path: '/v1/accounts/{accountSid}/schedules/{scheduleSid}/appointments',
   config: {

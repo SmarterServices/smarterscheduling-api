@@ -1,6 +1,7 @@
 'use strict';
 
 const joi = require('joi');
+const utils = require('./../../../lib/helpers/utils');
 
 const schema = {
   add: {
@@ -8,55 +9,88 @@ const schema = {
       .object({
         accountSid: joi
           .string()
+          .regex(/^(SA)|(PA)[a-f0-9]{32}$/, 'Account Sid')
           .required()
-          .description('Account Sid'),
-
-        scheduleSid: joi
-          .string()
-          .required()
-          .description('Schedule Sid')
+          .description('Account Sid')
       }),
     payload: joi.object({
-      id: joi
+      seatSid: joi
+        .string()
+        .regex(/^SE[a-f0-9]{32}$/, 'SeatSid')
+        .optional()
+        .description('Seat Sid'),
+      calendarSid: joi
+        .string()
+        .regex(/^CL[a-f0-9]{32}$/, 'Calendar Sid')
+        .required()
+        .description('Calendar Sid'),
+      startDateTime: joi
+        .string()
+        .isoDate()
+        .regex(/.*Z/, 'ISO time format in utc zone')
+        .example(utils.dateTemplate(), 'date template')
+        .required()
+        .description('Start Date'),
+      duration: joi
+        .number()
+        .integer()
+        .positive()
+        .required()
+        .description('Duration of Exam'),
+      externalId: joi
+        .string()
+        .allow(null, '')
+        .max(255)
+        .empty('')
+        .default(null)
+        .description('External ID'),
+      externalSystem: joi
+        .string()
+        .allow(null, '')
+        .max(255)
+        .empty('')
+        .default(null)
+        .description('External System'),
+      firstName: joi
         .string()
         .required()
-        .description('Id'),
-      isDeleted: joi
-        .boolean()
-        .required()
-        .description('Is Deleted'),
-      name: joi
+        .description('The first name of the person making the reservation'),
+      lastName: joi
         .string()
         .required()
-        .description('Name'),
-      createdDate: joi
-        .date()
-        .required()
-        .description('Created Date'),
-      lastModifiedDate: joi
-        .date()
-        .required()
-        .description('Last Modified Date'),
-      systemModstamp: joi
-        .date()
-        .required()
-        .description('System Modstamp'),
-      seat: joi
+        .description('The last name of the person making the reservation'),
+      email: joi
         .string()
+        .email()
         .required()
-        .description('Seat'),
-      seatRSid: joi
-        .any()
-        .required()
-        .description('Seat R Sid'),
-      calendar: joi
+        .description('Email'),
+      phone: joi
         .string()
-        .required()
-        .description('Calendar'),
-      calendarRSid: joi
-        .any()
-        .required()
-        .description('Calendar R Sid')
+        .allow(null, '')
+        .empty('')
+        .default(null)
+        .description('Phone'),
+      notes: joi
+        .string()
+        .allow(null, '')
+        .empty('')
+        .default(null)
+        .description('Notes'),
+      metadata: joi
+        .object()
+        .raw()
+        .empty('')
+        .default(null)
+        .options({
+          allowUnknown: true,
+          stripUnknown: false,
+          language: {
+            object: {
+              base: '!!metadata must be an string' //Throw custom error
+            }
+          }
+        })
+        .description('Metadata')
     })
       .required()
       .description('Appointment payload')
@@ -68,11 +102,6 @@ const schema = {
           .string()
           .required()
           .description('Account Sid'),
-
-        scheduleSid: joi
-          .string()
-          .required()
-          .description('Schedule Sid'),
 
         appointmentSid: joi
           .string()
@@ -88,11 +117,6 @@ const schema = {
           .required()
           .description('Account Sid'),
 
-        scheduleSid: joi
-          .string()
-          .required()
-          .description('Schedule Sid'),
-
         appointmentSid: joi
           .string()
           .required()
@@ -138,7 +162,51 @@ const schema = {
       calendarRSid: joi
         .any()
         .required()
-        .description('Calendar R Sid')
+        .description('Calendar R Sid'),
+      startDate: joi
+        .date()
+        .required()
+        .description('Start Date'),
+      endDate: joi
+        .date()
+        .required()
+        .description('End Date'),
+      externalId: joi
+        .string()
+        .allow(null)
+        .description('External ID'),
+      externalSystem: joi
+        .string()
+        .allow(null)
+        .description('External System'),
+      firstName: joi
+        .string()
+        .required()
+        .description('First Name'),
+      lastName: joi
+        .string()
+        .required()
+        .description('Last Name'),
+      email: joi
+        .string()
+        .required()
+        .description('Email'),
+      phone: joi
+        .string()
+        .allow(null)
+        .description('Phone'),
+      notes: joi
+        .string()
+        .allow(null)
+        .description('Notes'),
+      metadata: joi
+        .string()
+        .allow(null)
+        .description('Metadata'),
+      internalNotes: joi
+        .string()
+        .allow(null)
+        .description('Internal Notes')
     })
       .required()
       .description('Appointment payload')
@@ -150,11 +218,6 @@ const schema = {
           .string()
           .required()
           .description('Account Sid'),
-
-        scheduleSid: joi
-          .string()
-          .required()
-          .description('Schedule Sid'),
 
         appointmentSid: joi
           .string()
@@ -168,12 +231,7 @@ const schema = {
         accountSid: joi
           .string()
           .required()
-          .description('Account Sid'),
-
-        scheduleSid: joi
-          .string()
-          .required()
-          .description('Schedule Sid')
+          .description('Account Sid')
       }),
     query: {
       offset: joi

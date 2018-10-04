@@ -1,15 +1,18 @@
 'use strict';
 
 module.exports = (json, {appointment}) => {
-  json.set('id', appointment.id);
-  json.set('isDeleted', appointment.isDeleted);
-  json.set('name', appointment.name);
-  json.set('createdDate', appointment.createdDate);
-  json.set('lastModifiedDate', appointment.lastModifiedDate);
-  json.set('systemModstamp', appointment.systemModstamp);
   json.set('sid', appointment.sid);
-  json.set('seat', appointment.seat);
-  json.set('seatRSid', appointment.seatRSid);
-  json.set('calendar', appointment.calendar);
-  json.set('calendarRSid', appointment.calendarRSid);
+  json.set('seatSid', appointment.seatSid);
+  json.set('calendarSid', appointment.calendarSid);
+  json.set('startDateTime', appointment.startDate);
+  json.set('endDateTime', appointment.endDate);
+  json.set('firstName', appointment.firstName);
+  json.set('lastName', appointment.lastName);
+  json.set('email', appointment.email);
+  json.set('phone', appointment.phone);
+  json.set('externalId', appointment.externalId);
+  json.set('externalSystem', appointment.externalSystem);
+  json.set('notes', appointment.notes);
+  json.set('internalNotes', appointment.internalNotes);
+  json.set('metadata', appointment.metadata);
 };
