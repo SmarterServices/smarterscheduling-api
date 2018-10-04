@@ -197,6 +197,61 @@ describe('Accounts', function testAccounts() {
     });
   });
 
+  describe('GET', function () {
+    const urlTemplate = endpoints.account.get;
+    it('Should get account successfully for [SA prefixed] [account] and return 200 response', function () {
+      // The first account which was added is 'SA' prefixed account
+      const params = {
+        accountSid: accounts[0].sid
+      };
+
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(result).to.eql(accounts[0]);
+        });
+    });
+
+    it('Should get account successfully for [PA prefixed] [account] and return 200 response', function () {
+      // The second account which was added is 'PA' prefixed account
+      const params = {
+        accountSid: accounts[1].sid
+      };
+
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(result).to.eql(accounts[1]);
+        });
+    });
+
+    it('Should fail to get account for invalid [accountSid] and return 404 response', function () {
+      const params = {
+        accountSid: common.makeGenericSid('SA')
+      };
+
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('ACCOUNT_NOT_FOUND', response);
+        });
+    });
+  });
+
   describe('LIST Appointment Availability', function () {
     let accountSid;
     let accountSid1;
