@@ -2,11 +2,10 @@
 
 module.exports = (json, {location}) => {
   json.set('sid', location.sid);
+  json.set('accountSid', location.schedulingAccountSid);
   json.set('title', location.title);
   json.set('externalId', location.externalId);
-  json.set('schedulingAccountSid', location.schedulingAccountSid);
   json.set('seatManagement', location.seatManagement);
   json.set('createdDate', location.createdDate);
-  json.set('lastModifiedDate', location.lastModifiedDate);
-  json.set('systemModstamp', location.systemModstamp);
+  json.set('editDate', location.lastModifiedDate);
 };

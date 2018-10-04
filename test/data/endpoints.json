@@ -25,6 +25,7 @@
   },
   "location": {
     "post": "v1/accounts/{accountSid}/locations",
-    "list": "v1/accounts/{accountSid}/locations"
+    "list": "v1/accounts/{accountSid}/locations",
+    "get": "v1/accounts/{accountSid}/locations/{locationSid}"
   }
 }

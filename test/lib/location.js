@@ -33,7 +33,7 @@ describe('Locations', function testAccounts() {
   describe('POST', function () {
     const urlTemplate = endpoints.location.post;
     let defaultUrl;
-    const omittedField = ['sid', 'lastModifiedDate', 'createdDate', 'systemModstamp', 'schedulingAccountSid'];
+    const omittedField = ['sid', 'editDate', 'createdDate', 'systemModstamp', 'accountSid'];
 
     before('Populate data', () => {
       defaultUrl = common.buildUrl(urlTemplate, {accountSid});
@@ -52,7 +52,7 @@ describe('Locations', function testAccounts() {
           locations.push(result);
 
           expect(_.omit(result, omittedField)).to.eql(payload);
-          expect(result.schedulingAccountSid).to.eql(accountSid);
+          expect(result.accountSid).to.eql(accountSid);
         });
 
     });
@@ -71,7 +71,7 @@ describe('Locations', function testAccounts() {
           // Result Object is pushed in the location1 array here because of different account sid
           locations1.push(result);
           expect(_.omit(result, omittedField)).to.eql(payload);
-          expect(result.schedulingAccountSid).to.eql(accountSid2);
+          expect(result.accountSid).to.eql(accountSid2);
         });
 
     });
@@ -92,7 +92,7 @@ describe('Locations', function testAccounts() {
 
           expect(result.sid).to.equal(payload.sid);
           expect(_.omit(result, omittedField)).to.eql(_.omit(payload, omittedField));
-          expect(result.schedulingAccountSid).to.eql(accountSid2);
+          expect(result.accountSid).to.eql(accountSid2);
         });
     });
 
@@ -112,7 +112,7 @@ describe('Locations', function testAccounts() {
 
           expect(result.sid).to.equal(payload.sid);
           expect(_.omit(result, omittedField)).to.eql(_.omit(payload, omittedField));
-          expect(result.schedulingAccountSid).to.eql(accountSid2);
+          expect(result.accountSid).to.eql(accountSid2);
         });
     });
 
@@ -144,7 +144,7 @@ describe('Locations', function testAccounts() {
           locations.push(result);
 
           expect(_.omit(result, omittedField)).to.eql(payload);
-          expect(result.schedulingAccountSid).to.eql(accountSid);
+          expect(result.accountSid).to.eql(accountSid);
         });
 
     });
@@ -163,7 +163,7 @@ describe('Locations', function testAccounts() {
           locations.push(result);
 
           expect(_.omit(result, omittedField)).to.eql(payload);
-          expect(result.schedulingAccountSid).to.eql(accountSid);
+          expect(result.accountSid).to.eql(accountSid);
         });
 
     });
@@ -326,6 +326,97 @@ describe('Locations', function testAccounts() {
           name: 'location'
         });
 
+    });
+  });
+
+  describe('GET', function () {
+    const urlTemplate = endpoints.location.get;
+
+    it('Should get successfully for [SA prefixed] [account] and [SL prefixed] [location] and return 200 response', function () {
+      const params = {
+        accountSid,
+        locationSid: locations[0].sid
+      };
+
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(result).to.eql(locations[0]);
+        });
+    });
+
+    it('Should get successfully for [PA prefixed] [account] and [PL prefixed] [location] and return 200 response', function () {
+      const params = {
+        accountSid: accountSid2,
+        locationSid: locations1[0].sid
+      };
+
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(result).to.eql(locations1[0]);
+        });
+    });
+
+    it('Should fail for invalid [accountSid] and return 400 response', function () {
+      const params = {
+        accountSid: common.makeGenericSid('SA'),
+        locationSid: locations[0].sid
+      };
+
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('ACCOUNT_NOT_FOUND', response);
+        });
+    });
+
+    it('Should fail for invalid [locationSid] and return 400 response', function () {
+      const params = {
+        accountSid,
+        locationSid: common.makeGenericSid('SL')
+      };
+
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('LOCATION_NOT_FOUND_UNDER_ACCOUNT', response);
+        });
+    });
+
+    it('Should fail for different [locationSid] and return 400 response', function () {
+      const params = {
+        accountSid,
+        locationSid: locations1[0].sid
+      };
+
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('LOCATION_NOT_FOUND_UNDER_ACCOUNT', response);
+        });
     });
   });
 });
