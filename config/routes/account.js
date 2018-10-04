@@ -58,13 +58,16 @@ module.exports = [{
       query: accountSchema.list.query
     }
   }
-},/* {
+}, {
   method: 'GET',
   path: '/v1/accounts/{accountSid}',
   config: {
     handler: function (request, reply) {
 
-      const opts = {
+      // Account data is coming from param validation plugin so, no need to call handler
+      utils.replyJson('partials/account.js', {account: request.paramValidationResult.account}, reply);
+
+      /*const opts = {
         params: request.params
       };
 
@@ -74,15 +77,21 @@ module.exports = [{
         } else {
           utils.replyJson('partials/account', {account: r}, reply);
         }
-      });
+      });*/
     },
     tags: ['api', 'Account'],
     description: 'Get account',
     validate: {
       params: accountSchema.get.params
+    },
+    plugins: {
+      paramValidate: {
+        relationName: 'account',
+        primaryKey: 'accountSid'
+      }
     }
   }
-}, {
+}, /* {
   method: 'PUT',
   path: '/v1/accounts/{accountSid}',
   config: {

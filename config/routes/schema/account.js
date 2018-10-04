@@ -28,6 +28,7 @@ const schema = {
       .object({
         accountSid: joi
           .string()
+          .regex(/^(SA)|(PA)[a-f0-9]{32}$/, 'accountSid')
           .required()
           .description('Account Sid')
       })
