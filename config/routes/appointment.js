@@ -151,4 +151,40 @@ module.exports = [{
       params: appointmentSchema.delete.params
     }
   }
-}*/];
+}*/, {
+  method: 'PATCH',
+  path: '/v1/accounts/{accountSid}/appointments/{appointmentSid}',
+  config: {
+    handler: function (request, reply) {
+
+      const opts = {
+        params: request.params,
+        payload: request.payload,
+        paramValidationResult: request.paramValidationResult
+      };
+
+      appointmentHandler.patchAppointment(opts, function (err, r) {
+        if (err) {
+          errorResponse.formatError(err, null, reply);
+        } else {
+          utils.replyJson('partials/appointment', {appointment: r}, reply);
+        }
+      });
+    },
+    tags: ['api', 'Appointment'],
+    description: 'Patch appointment',
+    validate: {
+      params: appointmentSchema.patch.params,
+      payload: appointmentSchema.patch.payload
+    },
+    plugins: {
+      paramValidate: [{
+        relationName: 'account',
+        primaryKey: 'accountSid'
+      }, {
+        relationName: 'appointment',
+        primaryKey: 'appointmentSid'
+      }]
+    }
+  }
+}];

@@ -111,5 +111,9 @@
     "code": "1215",
     "message": "Appointment '%appointmentSid%' not found",
     "status": 404
+  },
+  "APPOINTMENT_UPDATE_FAILED": {
+    "code": "1216",
+    "message": "Appointment Update failed due to inadequate seat"
   }
 }
