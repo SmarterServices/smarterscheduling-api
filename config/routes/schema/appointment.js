@@ -86,7 +86,7 @@ const schema = {
           stripUnknown: false,
           language: {
             object: {
-              base: '!!metadata must be an string' //Throw custom error
+              base: '!!metadata must be an valid json string' //Throw custom error
             }
           }
         })
@@ -256,6 +256,98 @@ const schema = {
         .valid('ASC', 'DESC')
         .description('Sort order')
     }
+  },
+  patch: {
+    params: joi
+      .object({
+        accountSid: joi
+          .string()
+          .regex(/^(SA)|(PA)[a-f0-9]{32}$/, 'Account Sid')
+          .required()
+          .description('Account Sid'),
+        appointmentSid: joi
+          .string()
+          .regex(/^SP[a-f0-9]{32}$/, 'Account Sid')
+          .required()
+          .description('Appointment Sid')
+      }),
+    payload: joi.object({
+      startDateTime: joi
+        .string()
+        .isoDate()
+        .regex(/.*Z/, 'ISO time format in utc zone')
+        .example(utils.dateTemplate(), 'date template')
+        .description('Start Date Time'),
+      duration: joi
+        .number()
+        .integer()
+        .positive()
+        .description('Duration of Exam'),
+      externalId: joi
+        .string()
+        .allow(null, '')
+        .max(255)
+        .empty('')
+        .description('External ID'),
+      externalSystem: joi
+        .string()
+        .allow(null, '')
+        .max(255)
+        .empty('')
+        .description('External System'),
+      firstName: joi
+        .string()
+        .description('First Name'),
+      lastName: joi
+        .string()
+        .description('Last Name'),
+      email: joi
+        .string()
+        .email()
+        .description('Email'),
+      phone: joi
+        .string()
+        .allow(null, '')
+        .empty('')
+        .description('Phone'),
+      notes: joi
+        .string()
+        .allow(null, '')
+        .description('Notes'),
+      metadata: joi
+        .object()
+        .raw()
+        .empty('')
+        .options({
+          allowUnknown: true,
+          stripUnknown: false,
+          language: {
+            object: {
+              base: '!!metadata must be an valid json string' //Throw custom error
+            }
+          }
+        })
+        .description('Metadata'),
+      internalNotes: joi
+        .string()
+        .allow(null, '')
+        .empty('')
+        .description('Internal Notes'),
+      status: joi
+        .string()
+        .valid('scheduled', 'cancelled')
+        .description('Status'),
+      statusMemo: joi
+        .string()
+        .allow(null, '')
+        .empty('')
+        .max(255)
+        .description('Status Memo')
+
+    })
+      .and('startDateTime', 'duration')
+      .required()
+      .description('Patch Schema Payload')
   }
 };
 
