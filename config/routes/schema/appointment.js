@@ -79,6 +79,7 @@ const schema = {
       metadata: joi
         .object()
         .raw()
+        .allow(null, '')
         .empty('')
         .default(null)
         .options({
