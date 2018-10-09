@@ -11,6 +11,7 @@ module.exports = (json, {availability}) => {
   json.set('dayOfWeek', availability.dayOfWeek);
   json.set('startTime', availability.startTime);
   json.set('endTime', availability.endTime);
+  json.set('override',availability.override);
   json.set('recurring', availability.recurring);
   json.set('createdDate', availability.createdDate);
   json.set('editDate', availability.lastModifiedDate);
