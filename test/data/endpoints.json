@@ -5,6 +5,9 @@
     "get": "v1/accounts/{accountSid}",
     "listAppointmentAvailability": "v1/accounts/{accountSid}/availability"
   },
+  "appointment": {
+    "list": "v1/accounts/{accountSid}/appointments"
+  },
   "availability": {
     "post": "v1/accounts/{accountSid}/schedules/{scheduleSid}/availability",
     "list": "v1/accounts/{accountSid}/schedules/{scheduleSid}/availability",
