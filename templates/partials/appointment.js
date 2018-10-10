@@ -15,4 +15,8 @@ module.exports = (json, {appointment}) => {
   json.set('notes', appointment.notes);
   json.set('internalNotes', appointment.internalNotes);
   json.set('metadata', appointment.metadata);
+  json.set('duration', appointment.duration);
+
+  json.setIfSidExist('calendar', appointment.calendar, 'calendar', 'calendar');
+  json.setIfSidExist('seat', appointment.seat, 'seat', 'seat');
 };

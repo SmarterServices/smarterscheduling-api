@@ -5,9 +5,7 @@ module.exports = (json, {calendar}) => {
   json.set('locationSid', calendar.schedulingLocationSid);
   json.set('title', calendar.title);
   json.set('numberOfSeats', calendar.numberOfSeats);
-  json.set('schedule', json => {
-    json.set(json.partial('schedule', { schedule: calendar.schedule}));
-  });
+  json.setIfSidExist('schedule', calendar.schedule, 'schedule', 'schedule');
   json.set('createdDate', calendar.createdDate);
   json.set('editDate', calendar.lastModifiedDate);
 };
