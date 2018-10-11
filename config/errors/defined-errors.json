@@ -115,5 +115,9 @@
   "APPOINTMENT_UPDATE_FAILED": {
     "code": "1216",
     "message": "Appointment Update failed due to inadequate seat"
+  },
+  "DATE_RANGE_IS_GREATER_THAN_MONTH": {
+    "code": "1217",
+    "message": "The maximum difference between startDate and endDate must be 31 days"
   }
 }

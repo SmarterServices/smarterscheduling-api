@@ -36,9 +36,9 @@ module.exports = [{
       }
     }
   }
-}/*, {
+}, {
   method: 'GET',
-  path: '/v1/accounts/{accountSid}/schedules/{scheduleSid}/appointments',
+  path: '/v1/accounts/{accountSid}/appointments',
   config: {
     handler: function (request, reply) {
 
@@ -49,9 +49,9 @@ module.exports = [{
 
       appointmentHandler.listAppointment(opts, function (err, r) {
         if (err) {
-          reply(Boom.badRequest(err));
+          errorResponse.formatError(err, null, reply);
         } else {
-          utils.replyJson('appointment-collection.js',
+          utils.replyJson('date-wise-appointment-collection.js',
             {
               appointment: r,
               endpoint: utils.buildEndpointString(request),
@@ -65,9 +65,15 @@ module.exports = [{
     validate: {
       params: appointmentSchema.list.params,
       query: appointmentSchema.list.query
+    },
+    plugins: {
+      paramValidate: {
+        relationName: 'account',
+        primaryKey: 'accountSid'
+      }
     }
   }
-}*/, {
+}, {
   method: 'GET',
   path: '/v1/accounts/{accountSid}/appointments/{appointmentSid}',
   config: {

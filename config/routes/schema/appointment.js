@@ -232,31 +232,33 @@ const schema = {
       .object({
         accountSid: joi
           .string()
+          .regex(/^(SA)|(PA)[a-f0-9]{32}$/, 'Account Sid')
           .required()
           .description('Account Sid')
       }),
-    query: {
-      offset: joi
-        .number()
-        .integer()
-        .min(0)
-        .description('Offset for the list'),
-      limit: joi
-        .number()
-        .integer()
-        .min(0)
-        .description('Number of items to return'),
-      sortKeys: joi
-        .array()
-        .items(joi.string())
-        .single()
-        .default([])
-        .description('Keys to sort the data'),
-      sortOrder: joi
-        .string()
-        .valid('ASC', 'DESC')
-        .description('Sort order')
-    }
+    query: joi
+      .object({
+        startDate: joi
+          .date()
+          .format('YYYY-MM-DD')
+          .required()
+          .description('Start Date'),
+        endDate: joi
+          .date()
+          .format('YYYY-MM-DD')
+          .min(joi.ref('startDate'))
+          .required()
+          .description('End Date'),
+        calendarSid: joi
+          .string()
+          .regex(/^CL[a-f0-9]{32}$/, 'calendarSid')
+          .description('Identifier of Calendar'),
+        locationSid: joi
+          .string()
+          .regex(/^(SL)|(PL)[a-f0-9]{32}$/, 'locationSid')
+          .description('Identifier of Calendar')
+      })
+      .raw()
   },
   patch: {
     params: joi
