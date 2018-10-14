@@ -6,16 +6,19 @@ const expect = require('chai').expect;
 const common = require('./../common');
 const {populate} = common;
 
+const appointmentData = require('./../data/appointment');
 const calendarData = require('./../data/calendar');
 const endpoints = require('./../data/endpoints.json');
 const seatData = require('./../data/seat');
 
-describe('Appointment', function testAppoinment() {
+describe('Appointment', function testAppointment() {
   let accountSid;
   let accountSid2;
   let calendarSid;
   let locationSid;
   let seatSid;
+  let seatSid2;
+  let numberOfAddedAppointment = 0;
 
   before('populate data', function* () {
     const addedSids = yield createAccountAndCalendar();
@@ -23,20 +26,36 @@ describe('Appointment', function testAppoinment() {
     calendarSid = addedSids.calendarSid;
     locationSid = addedSids.locationSid;
 
-    let seat = yield populate.seat.addDefault({schedulingLocationSid: locationSid});
-    seatSid = seat.sid;
-
     accountSid2 = (yield populate.account.addDefault()).sid;
+
+    const seatRelatedSids = yield addSeatAndSchedule(locationSid, calendarSid);
+    seatSid = seatRelatedSids.seatSid;
+    let scheduleSid = seatRelatedSids.scheduleSid;
+
+    const seatRelatedSids2 = yield addSeatAndSchedule(locationSid, calendarSid);
+    seatSid2 = seatRelatedSids2.seatSid;
+
+    const availability = yield populate.availability.addDefault({
+      scheduleSid,
+      startDate: '2025-10-02',
+      endDate: '2025-10-10',
+      dayOfWeek: 6,
+      recurring: 'weekly',
+      startTime: '00:00',
+      endTime: '23:00'
+    });
   });
 
   after('clean data', function () {
     return Promise
       .all([
         populate.account.clean(),
+        populate.appointment.clean(),
+        populate.availability.clean(),
         populate.location.clean(),
         populate.calendar.clean(),
-        populate.seat.clean(),
-        populate.appointment.clean()
+        populate.calendarSeat.clean(),
+        populate.seat.clean()
 
       ]);
   });
@@ -272,6 +291,46 @@ describe('Appointment', function testAppoinment() {
       return addedAppointments;
     }
   });
+
+  describe('POST', function () {
+    const urlTemplate = endpoints.appointment.post;
+
+    it('Should add appointment successfully and return 200 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid});
+      const payload = Object.assign({}, appointmentData.post.payload.valid, {calendarSid});
+
+      return common
+        .request
+        .post(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          assertSuccessfulPostResponse(response, payload);
+          numberOfAddedAppointment++;
+        });
+    });
+
+    it('Should add appointment successfully filtered with [seatSid] and return 200 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid});
+      const payload = Object.assign({}, appointmentData.post.payload.valid, {calendarSid});
+      payload.startDateTime = moment(payload.startDateTime).add(numberOfAddedAppointment * 10, 'm').toISOString();
+      payload.seatSid = seatSid2;
+
+      return common
+        .request
+        .post(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          assertSuccessfulPostResponse(response, _.omit(payload, 'seatSid'));
+          expect(response.result.seatSid).to.eql(payload.seatSid);
+          numberOfAddedAppointment++;
+        });
+
+    });
+
+  });
+
 });
 
 /**
@@ -286,4 +345,36 @@ function* createAccountAndCalendar(accountSidPrefix) {
   const locationSid = (yield populate.location.addDefault({schedulingAccountSid: accountSid})).sid;
   const calendarSid = (yield populate.calendar.addDefault({schedulingLocationSid: locationSid})).sid;
   return {accountSid, calendarSid, locationSid};
+}
+
+
+/**
+ * Adds seat, calendarSeat and schedule for given location and calendar
+ * @param {string} locationSid - Sid of location
+ * @param {string} calendarSid - Sid of calendar
+ * @returns {Object} - Sid of seat and schedule
+ */
+function* addSeatAndSchedule(locationSid, calendarSid) {
+  const seat = yield populate.seat.addDefault({schedulingLocationSid: locationSid});
+  let seatSid = seat.sid;
+  const calendarSeat = yield populate.calendarSeat.addDefault({seatSid, calendarSid});
+  const schedule = yield populate.schedule.addDefault({seatSid, calendarSid});
+  const scheduleSid = schedule.sid;
+  return {seatSid, scheduleSid};
+}
+
+/**
+ * Asserts successful post response
+ * @param {Object} source - Response object
+ * @param {Object} payload - Payload to compare with
+ */
+function assertSuccessfulPostResponse(source, payload) {
+  const expectedResponse = _.omit(payload, 'duration');
+  Object.assign(expectedResponse, {
+    endDateTime: moment(payload.startDateTime).add(payload.duration, 'minutes').toISOString(),
+    internalNotes: null
+  });
+
+  expect(source.statusCode).to.eql(200);
+  expect(_.omit(source.result, 'sid', 'seatSid')).to.eql(expectedResponse);
 }
