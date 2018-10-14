@@ -368,6 +368,19 @@ const commonTools = {
         _this.compareDatabaseError(response);
         sequelizeMock.restore();
       });
+  },
+
+  /**
+   * Add seconds as suffix to the given time field
+   * @param {Object} data - Object to modify
+   * @param {Array<string>} fieldToModify - Name of the time field
+   * @returns {Object} - Modified Object
+   */
+  addSecondsToTime(data, fieldToModify) {
+    fieldToModify.forEach((field) => {
+      data[field] = moment(data[field], 'HH:mm').format('HH:mm:ss');
+    });
+    return data;
   }
 };
 
