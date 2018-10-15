@@ -38,9 +38,9 @@ describe('Appointment', function testAppointment() {
 
     const availability = yield populate.availability.addDefault({
       scheduleSid,
-      startDate: '2025-10-02',
-      endDate: '2025-10-10',
-      dayOfWeek: 6,
+      startDate: '3025-10-02',
+      endDate: '3025-10-10',
+      dayOfWeek: 2,
       recurring: 'weekly',
       startTime: '00:00',
       endTime: '23:00'
@@ -649,4 +649,5 @@ function assertSuccessfulPostResponse(source, payload) {
 
   expect(source.statusCode).to.eql(200);
   expect(_.omit(source.result, 'sid', 'seatSid')).to.eql(expectedResponse);
+  expect(source.result.seatSid).to.not.eql(null);
 }
