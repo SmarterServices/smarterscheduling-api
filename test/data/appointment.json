@@ -17,7 +17,7 @@
         "email": "string@gmail.com",
         "phone": "string",
         "notes": "string",
-        "metadata": null
+        "metadata": "{\"test\":\"string\",\"test2\":\"dummyString\"}"
       }
     }
   }

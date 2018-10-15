@@ -326,7 +326,129 @@ describe('Appointment', function testAppointment() {
           expect(response.result.seatSid).to.eql(payload.seatSid);
           numberOfAddedAppointment++;
         });
+    });
 
+    it('Should add appointment with null as [metadata] and return 200 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid});
+      const payload = Object.assign({}, appointmentData.post.payload.valid, {
+        calendarSid,
+        metadata: null
+      });
+      payload.startDateTime = moment(payload.startDateTime).add(numberOfAddedAppointment * 10, 'm').toISOString();
+
+      return common
+        .request
+        .post(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          assertSuccessfulPostResponse(response, _.omit(payload, 'seatSid'));
+          numberOfAddedAppointment++;
+        });
+    });
+
+    it('Should fail for invalid [accountSid] and return 404 response', function () {
+      const url = common.buildUrl(urlTemplate, {
+        accountSid: common.makeGenericSid('SA')
+      });
+      const payload = Object.assign({}, appointmentData.post.payload.valid, {calendarSid});
+
+      return common
+        .request
+        .post(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('ACCOUNT_NOT_FOUND', response);
+        });
+    });
+
+    it('Should fail for invalid [calendarSid] and return 404 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid});
+      const payload = Object.assign({}, appointmentData.post.payload.valid, {
+        calendarSid: common.makeGenericSid('CL')
+      });
+
+      return common
+        .request
+        .post(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('CALENDAR_NOT_FOUND_UNDER_ACCOUNT', response);
+        });
+    });
+
+    it('Should fail for [calendarSid] under different [accountSid] and return 400 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid: accountSid2});
+      const payload = Object.assign({}, appointmentData.post.payload.valid, {calendarSid});
+
+      return common
+        .request
+        .post(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('CALENDAR_NOT_FOUND_UNDER_ACCOUNT', response);
+        });
+    });
+
+    it('Should fail for invalid [seatSid] and return 400 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid});
+      const payload = Object.assign({}, appointmentData.post.payload.valid, {calendarSid});
+      payload.seatSid = common.makeGenericSid('SE');
+
+      return common
+        .request
+        .post(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('APPOINTMENT_CREATION_FAILED', response);
+        });
+    });
+
+    it('Should fail for unavailable [seat] and return 400 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid});
+      const payload = Object.assign({}, appointmentData.post.payload.valid, {calendarSid});
+      //seat is not available in this date time
+      payload.startDateTime = moment(payload.startDateTime).subtract('2', 'm').toISOString();
+
+      return common
+        .request
+        .post(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('APPOINTMENT_CREATION_FAILED', response);
+        });
+    });
+
+    it('Should fail for database failure of [validateCalendarWithAccount] and return 400 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid});
+      const payload = Object.assign({}, appointmentData.post.payload.valid, {calendarSid});
+      const request = common.request.post(url).send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'getData',
+          name: 'calendar'
+        });
+    });
+
+    it('Should fail for database failure of [addAppointment] and return 400 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid});
+      const payload = Object.assign({}, appointmentData.post.payload.valid, {calendarSid});
+      const request = common.request.post(url).send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'rawQuery',
+          name: 'addAppointment',
+          fileNamePattern: /.*services[\\\/]appointment\.js/
+        });
     });
 
   });
