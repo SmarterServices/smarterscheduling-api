@@ -533,6 +533,76 @@ describe('Appointment', function testAppointment() {
 
   });
 
+  describe('PATCH', function () {
+    const urlTemplate = endpoints.appointment.patch;
+
+    it('Should patch appointment successfully and return 200 response', function () {
+      const url = common.buildUrl(urlTemplate, {
+        accountSid,
+        appointmentSid: appointment.sid
+      });
+      const payload = _.cloneDeep(appointmentData.patch.payload.valid);
+      payload.startDateTime = moment(payload.startDateTime).add(numberOfAddedAppointment * 10, 'm').toISOString();
+
+
+      return common
+        .request
+        .patch(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          expect(response.statusCode).to.eql(200);
+
+          const expectedResponse = _.omit(payload, 'duration');
+          Object.assign(expectedResponse, {
+            calendarSid,
+            endDateTime: moment(payload.startDateTime).add(payload.duration, 'minutes').toISOString()
+          });
+          expect(_.omit(response.result, 'sid', 'seatSid')).to.eql(expectedResponse);
+          expect(response.result.seatSid).to.not.eql(null);
+        });
+    });
+
+    it('Should patch appointment with updating [status] and return 200 response', function* () {
+      const url = common.buildUrl(urlTemplate, {
+        accountSid,
+        appointmentSid: appointment.sid
+      });
+      const payload = {status: 'cancelled', statusMemo: 'Cancelled for Not Show'};
+
+      yield common
+        .request
+        .patch(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          expect(response.statusCode).to.eql(200);
+        });
+
+      //check response
+      const updatedAppointment = (yield populate.appointment.list({sid: appointment.sid}))[0];
+      expect(_.pick(updatedAppointment, ['status', 'statusMemo'])).to.eql(payload);
+    });
+
+    it('Should fail for invalid [accountSid] and return 404 response', function () {
+      const url = common.buildUrl(urlTemplate, {
+        accountSid: common.makeGenericSid('SA'),
+        appointmentSid: appointment.sid
+      });
+      const payload = _.cloneDeep(appointmentData.patch.payload.valid);
+
+      return common
+        .request
+        .patch(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('ACCOUNT_NOT_FOUND', response);
+        });
+    });
+
+  });
+
 });
 
 /**

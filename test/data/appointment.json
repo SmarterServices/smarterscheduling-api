@@ -20,5 +20,22 @@
         "metadata": "{\"test\":\"string\",\"test2\":\"dummyString\"}"
       }
     }
+  },
+  "patch": {
+    "payload": {
+      "valid": {
+        "startDateTime": "2025-10-04T00:00:00.000Z",
+        "duration": 5,
+        "externalId": "updateString",
+        "externalSystem": "updateString",
+        "firstName": "updateString",
+        "lastName": "updateString",
+        "email": "updateString@test.com",
+        "phone": "updateString",
+        "notes": "updateString",
+        "metadata": "{\"test\":\"string\",\"test2\":\"dummyString\"}",
+        "internalNotes": "Reason for update"
+      }
+    }
   }
 }
