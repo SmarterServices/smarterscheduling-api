@@ -19,6 +19,7 @@ describe('Appointment', function testAppointment() {
   let seatSid;
   let seatSid2;
   let numberOfAddedAppointment = 0;
+  let appointment;
 
   before('populate data', function* () {
     const addedSids = yield createAccountAndCalendar();
@@ -306,6 +307,7 @@ describe('Appointment', function testAppointment() {
         .end()
         .then(function (response) {
           assertSuccessfulPostResponse(response, payload);
+          appointment = response.result;
           numberOfAddedAppointment++;
         });
     });
@@ -448,6 +450,84 @@ describe('Appointment', function testAppointment() {
           type: 'rawQuery',
           name: 'addAppointment',
           fileNamePattern: /.*services[\\\/]appointment\.js/
+        });
+    });
+
+  });
+
+  describe('GET', function () {
+    const urlTemplate = endpoints.appointment.get;
+
+    it('Should get appointment successfully and return 200 response', function () {
+      const url = common.buildUrl(urlTemplate, {
+        accountSid,
+        appointmentSid: appointment.sid
+      });
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          expect(response.statusCode).to.eql(200);
+          expect(response.result).to.eql(appointment);
+        });
+    });
+
+    it('Should fail for invalid [accountSid] and return 404 response', function () {
+      const url = common.buildUrl(urlTemplate, {
+        accountSid: common.makeGenericSid('PA'),
+        appointmentSid: appointment.sid
+      });
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('ACCOUNT_NOT_FOUND', response);
+        });
+    });
+
+    it('Should fail for invalid [appointmentSid] and return 404 response', function () {
+      const url = common.buildUrl(urlTemplate, {
+        accountSid,
+        appointmentSid: common.makeGenericSid('SP')
+      });
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('APPOINTMENT_NOT_FOUND', response);
+        });
+    });
+
+    it('Should fail for [appointmentSid] under different [accountSid] and return 404 response', function () {
+      const url = common.buildUrl(urlTemplate, {
+        accountSid: accountSid2,
+        appointmentSid: appointment.sid
+      });
+
+      return common
+        .request
+        .get(url)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('CALENDAR_NOT_FOUND_UNDER_ACCOUNT', response);
+        });
+    });
+
+    it('Should fail for database failure of [validateCalendarWithAccount] and return 400 response', function () {
+      const url = common.buildUrl(urlTemplate, {accountSid, appointmentSid: appointment.sid});
+      const request = common.request.get(url);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'getData',
+          name: 'calendar'
         });
     });
 
