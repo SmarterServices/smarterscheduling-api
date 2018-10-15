@@ -499,4 +499,5 @@ function assertSuccessfulPostResponse(source, payload) {
 
   expect(source.statusCode).to.eql(200);
   expect(_.omit(source.result, 'sid', 'seatSid')).to.eql(expectedResponse);
+  expect(source.result.seatSid).to.not.eql(null);
 }
