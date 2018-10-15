@@ -22,3 +22,78 @@ BEGIN
 
  END
 $function$
+;
+
+CREATE OR REPLACE FUNCTION %schemaName%.fn_get_appointment_availability_with_seat_detail(calendarsid character varying, startdatetime timestamp without time zone, enddatetime timestamp without time zone, requestedduration integer)
+ RETURNS TABLE("startDateTime" timestamp without time zone, "seatSid" character varying)
+ LANGUAGE plpgsql
+AS $function$
+BEGIN
+
+ RETURN QUERY
+
+  SELECT DISTINCT time,s.sid__c as seat
+  from %schemaName%.sc_calendar__c c
+  join %schemaName%.sc_calendar_seat__c cs
+    on c.sid__c = cs.calendar__r__sid__c
+  join %schemaName%.sc_seat__c s
+    on s.sid__c = cs.seat__r__sid__c
+  join %schemaName%.sc_schedule__c ss
+    on ss.sid__c = s.schedule__r__sid__c or ss.calendar__r__sid__c = c.sid__c
+  join generate_series(round_minutes($2, ss.interval__c)::timestamp without time zone,
+                      ($3)::timestamp without time zone,
+                      (ss.interval__c||' minute')::interval) as time on true
+   -- First reduce the returned times by any that share the same day of week as an avalibility and are within start and end time of that avalibility
+   -- This will remove all times that fall outside any know avalibilities for a given schedule
+   join (select aa.sid as sid,aa.schedule_sid as schedule_sid,aa.start_time as start_time,aa.end_time as end_time,aa.dow as dow, aa.start_date_time as start_date_time, aa.end_date_time as end_date_time
+         from (select COALESCE(a2.sid__c,a1.sid__c) as sid,
+                COALESCE(a2.schedule__r__sid__c,a1.schedule__r__sid__c) as schedule_sid,
+                COALESCE(a2.start_time__c,a1.start_time__c) as start_time,
+                COALESCE(a2.end_time__c,a1.end_time__c) as end_time,
+                COALESCE(a2.day_of_week__c,a1.day_of_week__c) as dow,
+                COALESCE(a2.start_date__c,a1.start_date__c) as start_date_time,
+                COALESCE(a2.end_date__c,a1.end_date__c) as end_date_time
+              from %schemaName%.sc_availability__c a1
+                LEFT JOIN %schemaName%.sc_availability__c a2
+                  on a1.day_of_week__c = a2.day_of_week__c and a2.start_date__c is not null and a1.schedule__r__sid__c = a2.schedule__r__sid__c
+                -- had to remove this b/c it is not null
+                --where a1.start_date__c is null
+              ) as aa
+          ) a
+       on a.schedule_sid = ss.sid__c
+      and ((extract(dow from time) = a.dow) and time::time BETWEEN a.start_time and a.end_time and time::time + INTERVAL '60' minute BETWEEN a.start_time and a.end_time)
+      and (time BETWEEN a.start_date_time and a.end_date_time or (a.start_date_time is null or a.end_date_time is null)) or false
+where time BETWEEN $2 AND $3
+ and c.sid__c = $1
+
+ AND NOT EXISTS (
+                 SELECT 1
+                 FROM %schemaName%.sc_appointment__c app
+                 WHERE (app.start_date__c BETWEEN $2 AND $3 or app.end_date__c between $2 AND $3)
+                        and ((app.start_date__c, app.end_date__c) OVERLAPS (time,time + INTERVAL '60 minute' + INTERVAL '1 minute' * ss.end_buffer__c))
+                        and app.seat__r__sid__c = s.sid__c
+ )
+  AND NOT EXISTS (
+                 SELECT 1
+                 FROM %schemaName%.sc_availability_exclusion__c ave
+                 where ave.schedule__r__sid__c = ss.sid__c and (extract(dow from time) = ave.day_of_week__c) and (time::time BETWEEN ave.start_time__c and ave.end_time__c or (time + INTERVAL '60' minute)::time BETWEEN ave.start_time__c and ave.end_time__c) and ((time BETWEEN ave.start_date__c and ave.end_date__c) or (ave.start_date__c is null or ave.end_date__c is null))
+   )
+  ORDER BY time;
+ END
+$function$
+;
+
+CREATE OR REPLACE FUNCTION public.round_minutes(timestamp with time zone, double precision)
+ RETURNS timestamp with time zone
+ LANGUAGE sql
+ IMMUTABLE
+AS $function$
+  SELECT
+     date_trunc('hour', $1)
+     +  cast(($2::varchar||' min') as interval)
+     * round(
+     (date_part('minute',$1)::float + date_part('second',$1)/ 60.)::float
+     / $2::float
+      )
+$function$
+;

@@ -83,7 +83,7 @@ describe('Availability', function testAccounts() {
 
           expect(availabilityList.length).to.eql(2);
           for (let index = 0; index < availabilityList.length; index++) {
-            console.log(availabilityList[index], payload.create[index]) 
+
             assertSuccessResponse(availabilityList[index], payload.create[index], {scheduleSid});
           }
         });
@@ -543,7 +543,8 @@ describe('Availability', function testAccounts() {
      * @param {Object} [additionalField] - Any additional field that needs to be merged into source
      */
     function assertSuccessResponse(result, source, additionalField = {}) {
-      const payload = Object.assign({}, source, additionalField);
+      let payload = Object.assign({}, source, additionalField);
+      payload = common.addSecondsToTime(payload, ['startTime', 'endTime']);
       expect(_.omit(result, omittedField)).to.eql(payload);
     }
 

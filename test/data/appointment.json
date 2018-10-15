@@ -4,5 +4,21 @@
     "lastName": "Last name",
     "email": "test@test.com",
     "status": "scheduled"
+  },
+  "post": {
+    "payload": {
+      "valid": {
+        "startDateTime": "3025-10-04T00:00:00.000Z",
+        "duration": 5,
+        "externalId": "string",
+        "externalSystem": "string",
+        "firstName": "string",
+        "lastName": "string",
+        "email": "string@gmail.com",
+        "phone": "string",
+        "notes": "string",
+        "metadata": "{\"test\":\"string\",\"test2\":\"dummyString\"}"
+      }
+    }
   }
 }

@@ -521,7 +521,8 @@ describe('Exclusions', function testAccounts() {
         .end()
         .then(function (response) {
           const result = response.result;
-          const updatePayload = Object.assign({}, exclusions[0], payload);
+          let updatePayload = Object.assign({}, exclusions[0], payload);
+          updatePayload = common.addSecondsToTime(updatePayload, ['startTime', 'endTime']);
 
           expect(response.statusCode).to.equal(200);
           expect(_.omit(result, fieldsToIgnore)).to.eql(_.omit(updatePayload, fieldsToIgnore));
@@ -541,7 +542,8 @@ describe('Exclusions', function testAccounts() {
         .end()
         .then(function (response) {
           const result = response.result;
-          const updatePayload = Object.assign({}, exclusions1[0], payload);
+          let updatePayload = Object.assign({}, exclusions1[0], payload);
+          updatePayload = common.addSecondsToTime(updatePayload, ['startTime', 'endTime']);
 
           expect(response.statusCode).to.equal(200);
           expect(_.omit(result, fieldsToIgnore)).to.eql(_.omit(updatePayload, fieldsToIgnore));
@@ -774,6 +776,8 @@ describe('Exclusions', function testAccounts() {
  */
 function assertAddedData(result, source, additionalPayload = {}) {
   const omittedField = ['createdDate', 'editDate', 'sid'];
+
+  source = common.addSecondsToTime(source, ['startTime', 'endTime']);
 
   expect(_.omit(result, omittedField)).to.eql(_.merge(source, additionalPayload));
 }

@@ -6,6 +6,7 @@
     "listAppointmentAvailability": "v1/accounts/{accountSid}/availability"
   },
   "appointment": {
+    "post": "v1/accounts/{accountSid}/appointments",
     "list": "v1/accounts/{accountSid}/appointments"
   },
   "availability": {
