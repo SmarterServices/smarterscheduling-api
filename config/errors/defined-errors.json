@@ -1,0 +1,123 @@
+{
+  "JOI": {
+    "string.regex.name": {
+      "code": "400",
+      "message": "'%key%' with value %value% fails to match the %name% pattern"
+    },
+    "number.base": {
+      "code": "400",
+      "message": "%key% with value %value% must be a number"
+    },
+    "NOT_LISTED": {
+      "code": "4000",
+      "message": "Error Not Listed"
+    },
+    "DEFAULT": {
+      "code": "4000",
+      "message": "Joi validation failed"
+    }
+  },
+  "DEFAULT": {
+    "code": "6000",
+    "message": "Internal error occurred"
+  },
+  "ERROR_NOT_LISTED": {
+    "code": "7000",
+    "message": "Error Not Listed"
+  },
+  "UNAUTHORIZED": {
+    "code": "5000",
+    "message": "You are unauthorized to access or perform this action on this resource.",
+    "status": 401
+  },
+  "DATA_NOT_FOUND": {
+    "code": "1200",
+    "message": "Data not found",
+    "status": 404
+  },
+  "DATABASE_ERROR": {
+    "code": "1208",
+    "message": "Database error occurred"
+  },
+  "ACCOUNT_NOT_FOUND": {
+    "code": "1201",
+    "message": "Account not found for '%schedulingAccountSid%'",
+    "status": 404
+  },
+  "LOCATION_NOT_FOUND": {
+    "code": "1202",
+    "message": "Location '%locationSid%' not found",
+    "status": 404
+  },
+  "SCHEDULE_NOT_FOUND": {
+    "code": "1203",
+    "message": "Schedule '%scheduleSid%' not found",
+    "status": 404
+  },
+  "EXCLUSION_NOT_FOUND_UNDER_ACCOUNT": {
+    "code": "1204",
+    "message": "Exclusion '%exclusionSid%' not found under '%schedulingAccountSid%'",
+    "status": 404
+  },
+  "LOCATION_NOT_FOUND_UNDER_ACCOUNT": {
+    "code": "1205",
+    "message": "Location '%schedulingLocationSid%' not found under Account '%schedulingAccountSid%'",
+    "status": 404
+  },
+  "NUMBER_OF_SEATS_REQUIRED": {
+    "code": "1206",
+    "message": "Number of seats field is required"
+  },
+  "CALENDAR_NOT_FOUND_UNDER_LOCATION": {
+    "code": "1207",
+    "message": "Calendar '%calendarSid%' not found under Location '%schedulingLocationSid%'",
+    "status": 404
+  },
+  "CALENDAR_NOT_FOUND_UNDER_ACCOUNT": {
+    "code": "1208",
+    "message": "Calendar '%calendarSid%' not found under Account '%schedulingAccountSid%'",
+    "status": 404
+  },
+  "END_DATE_TIME_SHOULD_BE_AFTER_START_DATE_TIME": {
+    "code": "1209",
+    "message": "End date time '%endDateTime%' must be after start date time '%startDateTime%'",
+    "status": 404
+  },
+  "SCHEDULE_NOT_FOUND_UNDER_ACCOUNT": {
+    "code": "1210",
+    "message": "Schedule '%scheduleSid%' not found under Account '%schedulingAccountSid%'",
+    "status": 404
+  },
+  "AVAILABILITY_LIST_NOT_FOUND": {
+    "code": "1211",
+    "message": "One Availability between '%availabilitySid%' not found",
+    "status": 404
+  },
+  "SID_ALREADY_EXISTS": {
+    "code": "1212",
+    "message": "Sid '%sid%' already exists",
+    "status": 404
+  },
+  "CALENDAR_NOT_FOUND": {
+    "code": "1213",
+    "message": "Calendar'%calendarSid%' not found",
+    "status": 404
+  },
+  "APPOINTMENT_CREATION_FAILED": {
+    "code": "1214",
+    "message": "Appointment insertion failed due to inadequate seat or data"
+  },
+  "APPOINTMENT_NOT_FOUND": {
+    "code": "1215",
+    "message": "Appointment '%appointmentSid%' not found",
+    "status": 404
+  },
+  "APPOINTMENT_UPDATE_FAILED": {
+    "code": "1216",
+    "message": "Appointment Update failed due to inadequate seat"
+  },
+  "DATE_RANGE_IS_GREATER_THAN_MONTH": {
+    "code": "1217",
+    "message": "The maximum difference between startDate and endDate must be 31 days"
+  }
+}

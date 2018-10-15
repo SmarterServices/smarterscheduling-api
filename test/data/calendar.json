@@ -1,0 +1,23 @@
+{
+  "post": {
+    "payload": {
+      "valid": {
+        "title": "Demo Calendar",
+        "numberOfSeats": 2
+      }
+    }
+  },
+  "build": {
+    "title": "Test Calendar"
+  },
+  "update": {
+    "payload": {
+      "valid": {
+        "title": "Updated title",
+        "numberOfSeats": 2,
+        "interval": 10,
+        "endBuffer": 2
+      }
+    }
+  }
+}

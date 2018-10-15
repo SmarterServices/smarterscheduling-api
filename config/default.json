@@ -1,0 +1,54 @@
+{
+  "rootApplication": {
+    "url": "http://localhost:8013"
+  },
+  "databases": [
+    {
+      "dialect": "postgres",
+      "host": "ec2-54-83-29-34.compute-1.amazonaws.com",
+      "databaseName": "d2ct4l1ls3t2sp",
+      "userName": "jphdjspezhudpt",
+      "password": "a8878d2d524e07cde908be40f29e59f0c015e77984e8937d3f5c296cb77c5451",
+      "schema": "salesforce",
+      "operatorsAliases": false,
+      "ssl": true,
+      "sortKey": "sid",
+      "namespace": "smarter-scheduling",
+      "scriptOrder": {
+        "generate.sql": 0,
+        "procedures.sql": 1,
+        "triggers.sql": 2
+      }
+    }
+  ],
+  "logger": {
+    "targets": [
+      {
+        "name": "console",
+        "options": {
+          "wrapMethods": [
+            "error"
+          ]
+        }
+      }
+    ]
+  },
+  "salesforce": {
+    "userName": "jason@smarterservices.com.dev",
+    "password": "Thefactory6cYapM0zIfAObjimnzAJ4R2Qr5",
+    "loginUrl": "https://cs51.salesforce.com"
+  },
+  "herokuConnect": {
+    "host": "connect-us.heroku.com",
+    "connectionId": "8806cf52-d296-4aba-b8b1-bedd8c783907",
+    "authorization": "Bearer a006440b-89d6-4111-af3a-dc7fa2658ad1",
+    "port": 443
+  },
+  "serverSettings": {
+    "port": 8013,
+    "address": "0.0.0.0",
+    "routes": {
+      "cors": true
+    }
+  }
+}

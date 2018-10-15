@@ -1,0 +1,15 @@
+{
+  "post": {
+    "payload": {
+      "valid": {
+        "title": "string",
+        "externalId": "string",
+        "seatManagement": "basic"
+      }
+    }
+  },
+  "build": {
+    "title": "Test Title",
+    "seatManagement": "basic"
+  }
+}

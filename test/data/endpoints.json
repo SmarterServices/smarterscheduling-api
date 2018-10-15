@@ -1,0 +1,36 @@
+{
+  "account": {
+    "post": "v1/accounts",
+    "list": "v1/accounts",
+    "get": "v1/accounts/{accountSid}",
+    "listAppointmentAvailability": "v1/accounts/{accountSid}/availability"
+  },
+  "appointment": {
+    "post": "v1/accounts/{accountSid}/appointments",
+    "list": "v1/accounts/{accountSid}/appointments",
+    "get": "v1/accounts/{accountSid}/appointments/{appointmentSid}"
+  },
+  "availability": {
+    "post": "v1/accounts/{accountSid}/schedules/{scheduleSid}/availability",
+    "list": "v1/accounts/{accountSid}/schedules/{scheduleSid}/availability",
+    "listCalendarAvailability": "v1/accounts/{accountSid}/calendars/{calendarSid}/availability"
+  },
+  "calendar": {
+    "post": "v1/accounts/{accountSid}/locations/{locationSid}/calendars",
+    "list": "v1/accounts/{accountSid}/locations/{locationSid}/calendars",
+    "get": "v1/accounts/{accountSid}/locations/{locationSid}/calendars/{calendarSid}",
+    "update": "v1/accounts/{accountSid}/locations/{locationSid}/calendars/{calendarSid}"
+  },
+  "exclusion": {
+    "post": "v1/accounts/{accountSid}/exclusions",
+    "get": "v1/accounts/{accountSid}/exclusions/{exclusionSid}",
+    "update": "v1/accounts/{accountSid}/exclusions/{exclusionSid}",
+    "list": "v1/accounts/{accountSid}/exclusions",
+    "delete": "v1/accounts/{accountSid}/exclusions/{exclusionSid}"
+  },
+  "location": {
+    "post": "v1/accounts/{accountSid}/locations",
+    "list": "v1/accounts/{accountSid}/locations",
+    "get": "v1/accounts/{accountSid}/locations/{locationSid}"
+  }
+}
