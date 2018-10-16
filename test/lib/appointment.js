@@ -11,7 +11,7 @@ const calendarData = require('./../data/calendar');
 const endpoints = require('./../data/endpoints.json');
 const seatData = require('./../data/seat');
 
-describe('Appointment', function testAppointment() {
+describe.only('Appointment', function testAppointment() {
   let accountSid;
   let accountSid2;
   let calendarSid;
@@ -182,7 +182,7 @@ describe('Appointment', function testAppointment() {
       const url = common.buildUrl(urlTemplate, {accountSid});
       const payload = Object.assign({}, appointmentData.post.payload.valid, {calendarSid});
       //seat is not available in this date time
-      payload.startDateTime = moment(payload.startDateTime).subtract('2', 'm').toISOString();
+      payload.startDateTime = moment(payload.startDateTime).subtract(2, 'm').toISOString();
 
       return common
         .request
@@ -598,6 +598,92 @@ describe('Appointment', function testAppointment() {
         .end()
         .then(function (response) {
           common.assertFailResponse('ACCOUNT_NOT_FOUND', response);
+        });
+    });
+
+    it('Should fail for invalid [appointmentSid] and return 404 response', function () {
+      const url = common.buildUrl(urlTemplate, {
+        accountSid,
+        appointmentSid: common.makeGenericSid('SP')
+      });
+      const payload = _.cloneDeep(appointmentData.patch.payload.valid);
+
+      return common
+        .request
+        .patch(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('APPOINTMENT_NOT_FOUND', response);
+        });
+    });
+
+    it('Should fail for [appointmentSid] under different [accountSid] and return 404 response', function () {
+      const url = common.buildUrl(urlTemplate, {
+        accountSid: accountSid2,
+        appointmentSid: appointment.sid
+      });
+      const payload = _.cloneDeep(appointmentData.patch.payload.valid);
+
+      return common
+        .request
+        .patch(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('CALENDAR_NOT_FOUND_UNDER_ACCOUNT', response);
+        });
+    });
+
+    it('Should fail for unavailable seat and return 400 response', function () {
+      const url = common.buildUrl(urlTemplate, {
+        accountSid,
+        appointmentSid: appointment.sid
+      });
+      const payload = _.cloneDeep(appointmentData.patch.payload.valid);
+      //seat is not available in this date time
+      payload.startDateTime = moment(payload.startDateTime).subtract(2, 'm').toISOString();
+
+      return common
+        .request
+        .patch(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('APPOINTMENT_UPDATE_FAILED', response);
+        });
+    });
+
+    it('Should fail for database failure of [validateCalendarWithAccount] and return 400 response', function () {
+      const url = common.buildUrl(urlTemplate, {
+        accountSid,
+        appointmentSid: appointment.sid
+      });
+      const payload = Object.assign({}, appointmentData.patch.payload.valid, {calendarSid});
+      const request = common.request.patch(url).send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'getData',
+          name: 'calendar'
+        });
+    });
+
+    it('Should fail for database failure of [patchAppointment] and return 400 response', function () {
+      const url = common.buildUrl(urlTemplate, {
+        accountSid,
+        appointmentSid: appointment.sid
+      });
+      const payload = _.cloneDeep(appointmentData.patch.payload.valid);
+      const request = common.request.patch(url).send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'rawQuery',
+          name: 'patchAppointment',
+          fileNamePattern: /.*services[\\\/]appointment\.js/
         });
     });
 
