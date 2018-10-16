@@ -11,7 +11,7 @@ const calendarData = require('./../data/calendar');
 const endpoints = require('./../data/endpoints.json');
 const seatData = require('./../data/seat');
 
-describe.only('Appointment', function testAppointment() {
+describe('Appointment', function testAppointment() {
   let accountSid;
   let accountSid2;
   let calendarSid;
