@@ -10,6 +10,7 @@ const appointmentData = require('./../data/appointment');
 const calendarData = require('./../data/calendar');
 const endpoints = require('./../data/endpoints.json');
 const seatData = require('./../data/seat');
+const seatSidPattern = /^SE[a-f0-9]{32}$/
 
 describe('Appointment', function testAppointment() {
   let accountSid;
@@ -536,7 +537,7 @@ describe('Appointment', function testAppointment() {
   describe('PATCH', function () {
     const urlTemplate = endpoints.appointment.patch;
 
-    it('Should patch appointment successfully and return 200 response', function () {
+    it('Should update appointment with [starDateTime] successfully and return 200 response', function () {
       const url = common.buildUrl(urlTemplate, {
         accountSid,
         appointmentSid: appointment.sid
@@ -559,11 +560,11 @@ describe('Appointment', function testAppointment() {
             endDateTime: moment(payload.startDateTime).add(payload.duration, 'minutes').toISOString()
           });
           expect(_.omit(response.result, 'sid', 'seatSid')).to.eql(expectedResponse);
-          expect(response.result.seatSid).to.not.eql(null);
+          expect(response.result.seatSid).to.match(seatSidPattern);
         });
     });
 
-    it('Should patch appointment with updating [status] and return 200 response', function* () {
+    it('Should update appointment with updating [status] and return 200 response', function* () {
       const url = common.buildUrl(urlTemplate, {
         accountSid,
         appointmentSid: appointment.sid
@@ -735,5 +736,5 @@ function assertSuccessfulPostResponse(source, payload) {
 
   expect(source.statusCode).to.eql(200);
   expect(_.omit(source.result, 'sid', 'seatSid')).to.eql(expectedResponse);
-  expect(source.result.seatSid).to.not.eql(null);
+  expect(source.result.seatSid).to.match(seatSidPattern);
 }
