@@ -1034,6 +1034,245 @@ describe.only('Calendar', function testCalendar() {
     });
 
 
+    it('Should fail for database failure of [update calendar] and return 400 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      const request = common
+        .request
+        .put(url)
+        .send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'updateData',
+          name: 'calendar'
+        });
+    });
+
+
+    it('Should fail for database failure of [list calendar seat] and return 400 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      const request = common
+        .request
+        .put(url)
+        .send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'listData',
+          name: 'calendar-seat'
+        });
+    });
+
+
+    it('Should fail for database failure of [list update schedule] and return 400 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      const request = common
+        .request
+        .put(url)
+        .send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'updateData',
+          name: 'schedule'
+        });
+    });
+
+
+    it('Should fail for database failure of [get Calendar] and return 400 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      const request = common
+        .request
+        .put(url)
+        .send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'getData',
+          name: 'calendar'
+        });
+    });
+
+
+    it('Should fail for database failure of [get schedule] and return 400 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      const request = common
+        .request
+        .put(url)
+        .send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'getData',
+          name: 'schedule'
+        });
+    });
+
+
+    it('Should fail for database failure of [add seat] and return 400 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      payload.numberOfSeats++;
+
+      const request = common
+        .request
+        .put(url)
+        .send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'bulkCreate',
+          name: 'seat'
+        });
+    });
+
+
+    it('Should fail for database failure of [add calendar seat] and return 400 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      payload.numberOfSeats++;
+
+      const request = common
+        .request
+        .put(url)
+        .send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'bulkCreate',
+          name: 'calendar-seat'
+        });
+    });
+
+
+    it('Should fail for database failure of [delete calendar seat] and return 400 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      payload.numberOfSeats--;
+
+      const request = common
+        .request
+        .put(url)
+        .send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'deleteData',
+          name: 'calendar-seat'
+        });
+    });
+
+
+    it('Should fail for database failure of [delete seat] and return 400 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      payload.numberOfSeats--;
+
+      const request = common
+        .request
+        .put(url)
+        .send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'deleteData',
+          name: 'seat'
+        });
+    });
+
+
+    it('Should fail for database failure of [list appointment] and return 400 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      payload.numberOfSeats--;
+
+      const request = common
+        .request
+        .put(url)
+        .send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'listData',
+          name: 'appointment'
+        });
+    });
+
+
+    it('Should fail for database failure of [update appointment] and return 400 response', function* () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      payload.numberOfSeats--;
+
+
+      const preRequestCalendarSeats = (yield common.populate.calendarSeat.list());
+
+      const seatsForAppointment = preRequestCalendarSeats
+        .filter(seat => seat.calendarSid === calendarSid)
+        .map(seat => seat.seatSid);
+      const preRequestAppointments = [];
+
+      for (const seatSid of seatsForAppointment) {
+        const appointment = yield common.populate.appointment.addDefault({
+          calendarSid,
+          seatSid,
+          startDate: moment().toISOString(),
+          endDate: moment().toISOString()
+        });
+        preRequestAppointments.push(appointment);
+      }
+
+      const request = common
+        .request
+        .put(url)
+        .send(payload);
+
+      yield common
+        .testDatabaseFailure({
+          request,
+          type: 'updateData',
+          name: 'appointment'
+        });
+    });
+
+
     /**
      * Validate calendar data
      * @param {Object} payload - Payload sent for update
