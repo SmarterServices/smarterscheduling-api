@@ -1,16 +1,18 @@
 'use strict';
 
 const _ = require('lodash');
-const calendarData = require('./../data/calendar.json');
 const expect = require('chai').expect;
+const moment = require('moment');
+const Sequelize = require('sequelize');
+const sinon = require('sinon');
+
+const calendarData = require('./../data/calendar.json');
 const common = require('./../common');
 const endpoints = require('./../data/endpoints.json');
-const sinon = require('sinon');
-const scheduleService = require('./../../lib/services/schedule');
-const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
+const scheduleService = require('./../../lib/services/schedule');
 
-describe('Calendar', function testCalendar() {
+describe.only('Calendar', function testCalendar() {
   const calendars = [];
   // Calendars for 'PA' prefixed account and 'PL' prefixed location
   const calendars1 = [];
@@ -708,6 +710,563 @@ describe('Calendar', function testCalendar() {
           expect(response.statusCode).to.equal(200);
 
           assertCalendarData(payload, calendars1[0], result);
+        });
+    });
+
+
+    it('Should update calendar successfully without changing seats if number of seat is [unchanged] and return 200 response', function* () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      const preRequestSeats = (yield common.populate.seat.list());
+      const preRequestCalendarSeats = (yield common.populate.calendarSeat.list());
+
+
+      yield common
+        .request
+        .put(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(response.statusCode).to.equal(200);
+
+          assertCalendarData(payload, calendars[0], result);
+        });
+
+
+      const postRequestSeats = (yield common.populate.seat.list());
+      const postRequestCalendarSeats = (yield common.populate.calendarSeat.list());
+
+      expect(preRequestCalendarSeats.length).to.equal(postRequestCalendarSeats.length);
+      expect(preRequestSeats.length).to.equal(postRequestSeats.length);
+    });
+
+    it('Should update calendar successfully with adding [additional seats] and return 200 response', function* () {
+      const numberOfSeatsToAdd = 3;
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      payload.numberOfSeats += numberOfSeatsToAdd;
+
+      const preRequestSeats = (yield common.populate.seat.list());
+      const preRequestCalendarSeats = (yield common.populate.calendarSeat.list());
+
+
+      yield common
+        .request
+        .put(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(response.statusCode).to.equal(200);
+
+          assertCalendarData(payload, calendars[0], result);
+        });
+
+
+      const postRequestSeats = (yield common.populate.seat.list());
+      const postRequestCalendarSeats = (yield common.populate.calendarSeat.list());
+
+      expect(preRequestCalendarSeats.length + numberOfSeatsToAdd).to.equal(postRequestCalendarSeats.length);
+      expect(preRequestSeats.length + numberOfSeatsToAdd).to.equal(postRequestSeats.length);
+
+      const newSeats = _.differenceBy(postRequestCalendarSeats, preRequestCalendarSeats, 'sid');
+
+      //All the newly added seats should be under the sent calendar
+      newSeats.forEach((seat) => {
+        expect(seat.calendarSid).to.equal(calendarSid);
+      });
+    });
+
+
+    it('Should update calendar successfully with removing [additional seats] and return 200 response', function* () {
+      //No need to subtract number of seats as it was added in the previous test
+      const numberOfSeatsToRemove = 3;
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+
+      const preRequestSeats = (yield common.populate.seat.list());
+      const preRequestCalendarSeats = (yield common.populate.calendarSeat.list());
+
+
+      yield common
+        .request
+        .put(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(response.statusCode).to.equal(200);
+
+          assertCalendarData(payload, calendars[0], result);
+        });
+
+
+      const postRequestSeats = (yield common.populate.seat.list());
+      const postRequestCalendarSeats = (yield common.populate.calendarSeat.list());
+
+      expect(preRequestCalendarSeats.length - numberOfSeatsToRemove).to.equal(postRequestCalendarSeats.length);
+      expect(preRequestSeats.length - numberOfSeatsToRemove).to.equal(postRequestSeats.length);
+
+      const removedSeats = _.differenceBy(preRequestCalendarSeats, postRequestCalendarSeats, 'sid');
+
+      //All the newly added seats should be under the sent calendar
+      removedSeats.forEach((seat) => {
+        expect(seat.calendarSid).to.equal(calendarSid);
+      });
+    });
+
+
+    it('Should remove seats [without appointment] if possible and return 200 response', function* () {
+      const numberOfSeatsToRemove = 1;
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      payload.numberOfSeats -= numberOfSeatsToRemove;
+
+
+      const preRequestSeats = (yield common.populate.seat.list());
+      const preRequestCalendarSeats = (yield common.populate.calendarSeat.list());
+
+      const seatForAppointment = preRequestCalendarSeats.filter(seat => seat.calendarSid === calendarSid)[0].seatSid;
+
+      const preRequestAppointment = (yield common.populate.appointment.addDefault({
+        calendarSid,
+        seatSid: seatForAppointment,
+        startDate: moment().toISOString(),
+        endDate: moment().toISOString()
+      }));
+
+
+      yield common
+        .request
+        .put(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(response.statusCode).to.equal(200);
+
+          assertCalendarData(payload, calendars[0], result);
+        });
+
+
+      const postRequestSeats = (yield common.populate.seat.list());
+      const postRequestCalendarSeats = (yield common.populate.calendarSeat.list());
+      const postRequestAppointment = (yield common.populate.appointment.list({seatSid: seatForAppointment}))[0];
+
+      expect(preRequestCalendarSeats.length - numberOfSeatsToRemove).to.equal(postRequestCalendarSeats.length);
+      expect(preRequestSeats.length - numberOfSeatsToRemove).to.equal(postRequestSeats.length);
+      expect(postRequestAppointment.seatSid).to.equal(preRequestAppointment.seatSid);
+
+      const removedCalendarSeats = _.differenceBy(preRequestCalendarSeats, postRequestCalendarSeats, 'sid');
+
+      //All the newly added seats should be under the sent calendar
+      removedCalendarSeats.forEach((seat) => {
+        expect(seat.seatSid).to.not.equal(seatForAppointment);
+        expect(seat.calendarSid).to.equal(calendarSid);
+        expect(seat.calendarSid).to.equal(calendarSid);
+      });
+
+
+      //Revert back the number of seats
+      yield common
+        .request
+        .put(url)
+        .send(_.cloneDeep(calendarData.update.payload.valid))
+        .end();
+    });
+
+
+    it('Should remove minimum number of seat [with appointment] and return 200 response', function* () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+      const numberOfSeatsToRemove = payload.numberOfSeats - 1;
+
+      payload.numberOfSeats -= numberOfSeatsToRemove;
+
+
+      const preRequestSeats = (yield common.populate.seat.list());
+      const preRequestCalendarSeats = (yield common.populate.calendarSeat.list());
+
+      const seatsForAppointment = preRequestCalendarSeats
+        .filter(seat => seat.calendarSid === calendarSid)
+        .slice(0, 2)
+        .map(seat => seat.seatSid);
+      const preRequestAppointments = [];
+
+      for (const seatSid of seatsForAppointment) {
+        const appointment = yield common.populate.appointment.addDefault({
+          calendarSid,
+          seatSid,
+          startDate: moment().toISOString(),
+          endDate: moment().toISOString()
+        });
+        preRequestAppointments.push(appointment);
+      }
+
+
+      yield common
+        .request
+        .put(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          const result = response.result;
+          expect(response.statusCode).to.equal(200);
+
+          assertCalendarData(payload, calendars[0], result);
+        });
+
+
+      const postRequestSeats = (yield common.populate.seat.list());
+      const postRequestCalendarSeats = (yield common.populate.calendarSeat.list());
+      const postRequestAppointment = (yield common.populate.appointment.list({seatSid: seatsForAppointment}));
+
+      expect(preRequestCalendarSeats.length - numberOfSeatsToRemove).to.equal(postRequestCalendarSeats.length);
+      expect(preRequestSeats.length - numberOfSeatsToRemove).to.equal(postRequestSeats.length);
+
+      const appointmentWithSeat = postRequestAppointment.filter(appointment => appointment.seatSid !== null);
+
+      expect(appointmentWithSeat.length).to.equal(1);
+
+      const removedCalendarSeats = _.differenceBy(preRequestCalendarSeats, postRequestCalendarSeats, 'sid');
+
+      const removedCalderSeatWithAppointment = removedCalendarSeats
+        .filter(seat => seatsForAppointment.includes(seat.seatSid));
+
+      expect(removedCalderSeatWithAppointment.length).to.equal(1);
+
+      removedCalendarSeats.forEach((seat) => {
+        expect(seat.calendarSid).to.equal(calendarSid);
+        expect(seat.calendarSid).to.equal(calendarSid);
+      });
+    });
+
+
+    it('Should fail for invalid [calendarSid] and return 404 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid: common.makeGenericSid('CL')};
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .put(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('CALENDAR_NOT_FOUND_UNDER_LOCATION', response);
+        });
+    });
+
+
+    it('Should fail for different [calendarSid] and return 404 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid: calendars1[0].sid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .put(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('CALENDAR_NOT_FOUND_UNDER_LOCATION', response);
+        });
+    });
+
+
+    it('Should fail for invalid [locationSid] and return 404 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid: common.makeGenericSid('SL'), calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .put(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('LOCATION_NOT_FOUND_UNDER_ACCOUNT', response);
+        });
+    });
+
+
+    it('Should fail for different [accountSid] and return 404 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid: accountSid1, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .put(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('LOCATION_NOT_FOUND_UNDER_ACCOUNT', response);
+        });
+    });
+
+
+    it('Should fail for invalid [accountSid] and return 404 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid: common.makeGenericSid('SA'), locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      return common
+        .request
+        .put(url)
+        .send(payload)
+        .end()
+        .then(function (response) {
+          common.assertFailResponse('ACCOUNT_NOT_FOUND', response);
+        });
+    });
+
+
+    it('Should fail for database failure of [update calendar] and return 400 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      const request = common
+        .request
+        .put(url)
+        .send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'updateData',
+          name: 'calendar'
+        });
+    });
+
+
+    it('Should fail for database failure of [list calendar seat] and return 400 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      const request = common
+        .request
+        .put(url)
+        .send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'listData',
+          name: 'calendar-seat'
+        });
+    });
+
+
+    it('Should fail for database failure of [list update schedule] and return 400 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      const request = common
+        .request
+        .put(url)
+        .send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'updateData',
+          name: 'schedule'
+        });
+    });
+
+
+    it('Should fail for database failure of [get Calendar] and return 400 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      const request = common
+        .request
+        .put(url)
+        .send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'getData',
+          name: 'calendar'
+        });
+    });
+
+
+    it('Should fail for database failure of [get schedule] and return 400 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      const request = common
+        .request
+        .put(url)
+        .send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'getData',
+          name: 'schedule'
+        });
+    });
+
+
+    it('Should fail for database failure of [add seat] and return 400 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      payload.numberOfSeats++;
+
+      const request = common
+        .request
+        .put(url)
+        .send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'bulkCreate',
+          name: 'seat'
+        });
+    });
+
+
+    it('Should fail for database failure of [add calendar seat] and return 400 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      payload.numberOfSeats++;
+
+      const request = common
+        .request
+        .put(url)
+        .send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'bulkCreate',
+          name: 'calendar-seat'
+        });
+    });
+
+
+    it('Should fail for database failure of [delete calendar seat] and return 400 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      payload.numberOfSeats--;
+
+      const request = common
+        .request
+        .put(url)
+        .send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'deleteData',
+          name: 'calendar-seat'
+        });
+    });
+
+
+    it('Should fail for database failure of [delete seat] and return 400 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      payload.numberOfSeats--;
+
+      const request = common
+        .request
+        .put(url)
+        .send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'deleteData',
+          name: 'seat'
+        });
+    });
+
+
+    it('Should fail for database failure of [list appointment] and return 400 response', function () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      payload.numberOfSeats--;
+
+      const request = common
+        .request
+        .put(url)
+        .send(payload);
+
+      return common
+        .testDatabaseFailure({
+          request,
+          type: 'listData',
+          name: 'appointment'
+        });
+    });
+
+
+    it('Should fail for database failure of [update appointment] and return 400 response', function* () {
+      const payload = _.cloneDeep(calendarData.update.payload.valid);
+      const params = {accountSid, locationSid, calendarSid};
+      const url = common.buildUrl(urlTemplate, params);
+
+      payload.numberOfSeats--;
+
+
+      const preRequestCalendarSeats = (yield common.populate.calendarSeat.list());
+
+      const seatsForAppointment = preRequestCalendarSeats
+        .filter(seat => seat.calendarSid === calendarSid)
+        .map(seat => seat.seatSid);
+      const preRequestAppointments = [];
+
+      for (const seatSid of seatsForAppointment) {
+        const appointment = yield common.populate.appointment.addDefault({
+          calendarSid,
+          seatSid,
+          startDate: moment().toISOString(),
+          endDate: moment().toISOString()
+        });
+        preRequestAppointments.push(appointment);
+      }
+
+      const request = common
+        .request
+        .put(url)
+        .send(payload);
+
+      yield common
+        .testDatabaseFailure({
+          request,
+          type: 'updateData',
+          name: 'appointment'
         });
     });
 
