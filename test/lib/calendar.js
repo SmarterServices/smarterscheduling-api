@@ -945,9 +945,7 @@ describe.only('Calendar', function testCalendar() {
 
       expect(removedCalderSeatWithAppointment.length).to.equal(1);
 
-      //All the newly added seats should be under the sent calendar
       removedCalendarSeats.forEach((seat) => {
-        expect(seat.seatSid).to.not.equal(seatsForAppointment);
         expect(seat.calendarSid).to.equal(calendarSid);
         expect(seat.calendarSid).to.equal(calendarSid);
       });
