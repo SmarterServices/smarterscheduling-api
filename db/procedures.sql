@@ -188,6 +188,115 @@ $function$
 ;
 
 
+create function %schemaName%.fn_get_appointment_availability_with_seat_detail_final(calendarsid character varying, startdatetime timestamp with time zone, enddatetime timestamp with time zone, requestedduration integer) returns TABLE("startDateTime" timestamp without time zone, "seatSid" character varying)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+
+--raise notice 'calendarsid: %', $1;
+--raise notice 'startdatetime: %', $2;
+--raise notice 'enddatetime: %', $3;
+--raise notice 'requestedduration: %', $4;
+--raise notice 'at UTC: %', salesforce.round_minutes($2, 15)::timestamp at time zone 'UTC';
+--raise notice 'at Eastern: %', salesforce.round_minutes($2, 15)::timestamp at time zone 'America/New_York';
+--raise notice 'start time at Eastern: %', salesforce.round_minutes($2, 15)::timestamp at time zone 'UTC' at time zone 'America/New_York';
+--raise notice 'end time at Eastern: %', ($3)::timestamp at time zone 'UTC' at time zone 'America/New_York';
+
+ RETURN QUERY
+
+
+
+  SELECT DISTINCT (time)::timestamp at time zone coalesce(tz.name, 'America/New_York') at time zone 'UTC' as time,s.sid__c as seat
+
+    --, a.dow, a.start_time,a.start_date_time, a.end_time,  a.end_date_time, schedule_sid
+
+
+  from %schemaName%.sc_calendar__c c
+  join %schemaName%.sc_location__c l
+      ON l.sid__c = c.scheduling_location__r__sid__c
+  left join %schemaName%.time_zones__c tz
+      ON tz.sid__c = l.time_zone__r__sid__c
+  join %schemaName%.sc_calendar_seat__c cs
+    on c.sid__c = cs.calendar__r__sid__c
+  join %schemaName%.sc_seat__c s
+    on s.sid__c = cs.seat__r__sid__c
+  join %schemaName%.sc_schedule__c ss
+    on ss.sid__c = s.schedule__r__sid__c or ss.calendar__r__sid__c = c.sid__c
+  join generate_series(%schemaName%.round_minutes($2, ss.interval__c)::timestamp at time zone 'UTC' at time zone coalesce(tz.name, 'America/New_York'), ($3)::timestamp at time zone 'UTC' at time zone coalesce(tz.name, 'America/New_York'), (ss.interval__c||' minute')::interval) as time on true
+   -- First reduce the returned times by any that share the same day of week as an avalibility and are within start and end time of that avalibility
+   -- This will remove all times that fall outside any know avalibilities for a given schedule
+   join (
+          SELECT aa.sid as sid,aa.schedule_sid as schedule_sid,aa.start_time as start_time,aa.end_time as end_time,aa.dow as dow, aa.start_date_time as start_date_time, aa.end_date_time as end_date_time
+          FROM (
+              SELECT DISTINCT a1.sid__c as sid,
+                        a1.schedule__r__sid__c as schedule_sid,
+                        a1.start_time__c as start_time,
+                        a1.end_time__c as end_time,
+                        a1.day_of_week__c as dow,
+                        a1.start_date__c as start_date_time,
+                        a1.end_date__c as end_date_time
+                 FROM %schemaName%.sc_availability__c a1
+                WHERE a1.schedule__r__sid__c = (SELECT sid__c from %schemaName%.sc_schedule__c WHERE calendar__r__sid__c =  $1 LIMIT 1)
+              ) as aa
+             WHERE aa.schedule_sid = (SELECT sid__c from %schemaName%.sc_schedule__c WHERE calendar__r__sid__c = $1 LIMIT 1)
+          ) a
+       on a.schedule_sid = ss.sid__c
+
+     AND (
+
+           (extract(dow from (time )) = a.dow)
+          AND (time )::time BETWEEN a.start_time and a.end_time
+          AND (time)::time + ($4  || ' minute')::interval BETWEEN a.start_time and a.end_time
+
+          )
+          AND ((time )::date BETWEEN a.start_date_time AND a.end_date_time)
+where 0=0
+   AND (time)::timestamp at time zone coalesce(tz.name, 'America/New_York') at time zone 'UTC' BETWEEN $2 AND $3
+   AND c.sid__c = $1
+
+
+ AND NOT EXISTS (
+                 SELECT 1
+                 FROM %schemaName%.sc_appointment__c app
+                 WHERE (app.start_date__c BETWEEN $2 AND $3 or app.end_date__c between $2 AND $3)
+                        and ((app.start_date__c, app.end_date__c) OVERLAPS (time,time + ($4 || ' minute')::interval + INTERVAL '1 minute' * ss.end_buffer__c))
+                        and app.seat__r__sid__c = s.sid__c
+ )
+  AND NOT EXISTS (
+                 SELECT 1
+                 FROM %schemaName%.sc_availability_exclusion__c ave
+                 where ave.schedule__r__sid__c = ss.sid__c and (extract(dow from time) = ave.day_of_week__c) and (time::time BETWEEN ave.start_time__c and ave.end_time__c or (time + ($4 || ' minute')::interval)::time BETWEEN ave.start_time__c and ave.end_time__c) and ((time BETWEEN ave.start_date__c and ave.end_date__c) or (ave.start_date__c is null or ave.end_date__c is null))
+   )
+
+  ORDER BY time;
+ END
+$function$
+;
+
+
+create function %schemaName%.fn_get_appointment_availability_final(calendarsid character varying, startdatetime timestamp without time zone, enddatetime timestamp without time zone, requestedduration integer) returns TABLE("startDateTime" timestamp without time zone, "endDateTime" timestamp without time zone, "seatCount" integer, duration integer)
+LANGUAGE plpgsql
+AS $$
+BEGIN
+
+ RETURN QUERY
+
+  SELECT d."startDateTime", d."startDateTime" + ($4 ||' minutes')::interval as endDateTime,  cast(COUNT(1) as INTEGER), $4 as duration
+  FROM %schemaName%.fn_get_appointment_availability_with_seat_detail_final($1, $2, $3, $4) d
+  GROUP BY d."startDateTime"
+  ORDER BY d."startDateTime";
+
+ END
+ $function$
+;
+
+
+
+
+
+
+
+
 CREATE OR REPLACE FUNCTION public.round_minutes(timestamp with time zone, double precision)
  RETURNS timestamp with time zone
  LANGUAGE sql
