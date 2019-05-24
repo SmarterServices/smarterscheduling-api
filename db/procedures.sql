@@ -297,6 +297,22 @@ BEGIN
 
 
 
+CREATE OR REPLACE FUNCTION %schemaName%.round_minutes(timestamp with time zone, double precision)
+ RETURNS timestamp with time zone
+ LANGUAGE sql
+ IMMUTABLE
+AS $function$
+  SELECT
+     date_trunc('hour', $1)
+     +  cast(($2::varchar||' min') as interval)
+     * round(
+     (date_part('minute',$1)::float + date_part('second',$1)/ 60.)::float
+     / $2::float
+      )
+$function$
+;
+
+
 CREATE OR REPLACE FUNCTION public.round_minutes(timestamp with time zone, double precision)
  RETURNS timestamp with time zone
  LANGUAGE sql

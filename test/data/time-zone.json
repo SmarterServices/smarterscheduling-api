@@ -1,0 +1,42 @@
+{
+  "post": {
+    "payload": {
+      "valid": {
+        "name": "America/Los_Angeles",
+        "isDeleted": false,
+        "createdDate": "2017-06-04T22:00:00.000Z",
+        "lastModifiedDate": "2017-06-04T22:00:00.000Z",
+        "systemModStamp": "2017-06-04T22:00:00.000Z",
+        "proctoruIdMapping": "UTC",
+        "examityIdMapping": "2"
+      },
+      "valid2": {
+        "name": "America/New_York",
+        "isDeleted": false,
+        "createdDate": "2017-06-04T22:00:00.000Z",
+        "lastModifiedDate": "2017-06-04T22:00:00.000Z",
+        "systemModStamp": "2017-06-04T22:00:00.000Z",
+        "proctoruIdMapping": "UTC",
+        "examityIdMapping": "2"
+      },
+      "valid3": {
+        "name": "America/Texas",
+        "isDeleted": false,
+        "createdDate": "2017-06-04T22:00:00.000Z",
+        "lastModifiedDate": "2017-06-04T22:00:00.000Z",
+        "systemModStamp": "2017-06-04T22:00:00.000Z",
+        "proctoruIdMapping": "UTC",
+        "examityIdMapping": "2"
+      },
+      "valid4": {
+        "name": "America/Florida",
+        "isDeleted": false,
+        "createdDate": "2017-06-04T22:00:00.000Z",
+        "lastModifiedDate": "2017-06-04T22:00:00.000Z",
+        "systemModStamp": "2017-06-04T22:00:00.000Z",
+        "proctoruIdMapping": "UTC",
+        "examityIdMapping": "2"
+      }
+    }
+  }
+}

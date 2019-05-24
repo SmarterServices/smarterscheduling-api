@@ -16,6 +16,7 @@ const calendarData = require('./data/calendar');
 const locationData = require('./data/location');
 const scheduleData = require('./data/schedule');
 const seatData = require('./data/seat');
+const timeZoneData = require('./data/time-zone.json');
 
 const dataPopulate = {
   addByEndpoint: function addByEndpoint(url, payload) {
@@ -73,7 +74,8 @@ const dataPopulate = {
   exclusion: new Populator('sc_availability_exclusion__c', {}),
   location: new Populator('sc_location__c', locationData.build),
   seat: new Populator('sc_seat__c', seatData.build),
-  schedule: new Populator('sc_schedule__c', scheduleData.build)
+  schedule: new Populator('sc_schedule__c', scheduleData.build),
+  timeZone: new Populator('time_zones__c', timeZoneData.post.payload.valid)
 };
 
 

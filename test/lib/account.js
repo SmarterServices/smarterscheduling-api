@@ -306,6 +306,7 @@ describe('Accounts', function testAccounts() {
         .get(url)
         .end()
         .then(function (response) {
+
           const result = response.result.results;
           expect(result.length).to.eql(TOTAL_AVAILABILITY);
           for (const appointment of result) {
