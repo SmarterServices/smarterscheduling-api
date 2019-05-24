@@ -17,6 +17,9 @@ const randomSchemaConfig = {length: 10, capitalization: 'lowercase'};
 const schemaPrefix = 'scheduling_unit_test_';
 const randomSchema = schemaPrefix + randomStringGenerator.generate(randomSchemaConfig);
 require('mocha-generators').install();
+
+console.log(`>>>> Using Schema ${randomSchema}`);
+
 // update test database schema
 config.databases[0].schema = randomSchema;
 
