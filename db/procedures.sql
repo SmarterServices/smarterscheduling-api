@@ -190,7 +190,7 @@ $function$
 
 create function %schemaName%.fn_get_appointment_availability_with_seat_detail_final(calendarsid character varying, startdatetime timestamp with time zone, enddatetime timestamp with time zone, requestedduration integer) returns TABLE("startDateTime" timestamp without time zone, "seatSid" character varying)
 LANGUAGE plpgsql
-AS $$
+AS $function$
 BEGIN
 
 --raise notice 'calendarsid: %', $1;
@@ -276,7 +276,7 @@ $function$
 
 create function %schemaName%.fn_get_appointment_availability_final(calendarsid character varying, startdatetime timestamp without time zone, enddatetime timestamp without time zone, requestedduration integer) returns TABLE("startDateTime" timestamp without time zone, "endDateTime" timestamp without time zone, "seatCount" integer, duration integer)
 LANGUAGE plpgsql
-AS $$
+AS $function$
 BEGIN
 
  RETURN QUERY
