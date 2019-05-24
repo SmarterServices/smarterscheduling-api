@@ -206,23 +206,19 @@ BEGIN
 
 
 
-  SELECT DISTINCT (time)::timestamp at time zone coalesce(tz.name, 'America/New_York') at time zone 'UTC' as time,s.sid__c as seat
-
-    --, a.dow, a.start_time,a.start_date_time, a.end_time,  a.end_date_time, schedule_sid
-
-
-  from %schemaName%.sc_calendar__c c
-  join %schemaName%.sc_location__c l
+   SELECT DISTINCT (time)::timestamp at time zone coalesce(tz.name, 'America/New_York') at time zone 'UTC' as time,s.sid__c as seat
+  from salesforce.sc_calendar__c c
+  join salesforce.sc_location__c l
       ON l.sid__c = c.scheduling_location__r__sid__c
-  left join %schemaName%.time_zones__c tz
+  left join salesforce.time_zones__c tz
       ON tz.sid__c = l.time_zone__r__sid__c
-  join %schemaName%.sc_calendar_seat__c cs
+  join salesforce.sc_calendar_seat__c cs
     on c.sid__c = cs.calendar__r__sid__c
-  join %schemaName%.sc_seat__c s
+  join salesforce.sc_seat__c s
     on s.sid__c = cs.seat__r__sid__c
-  join %schemaName%.sc_schedule__c ss
+  join salesforce.sc_schedule__c ss
     on ss.sid__c = s.schedule__r__sid__c or ss.calendar__r__sid__c = c.sid__c
-  join generate_series(%schemaName%.round_minutes($2, ss.interval__c)::timestamp at time zone 'UTC' at time zone coalesce(tz.name, 'America/New_York'), ($3)::timestamp at time zone 'UTC' at time zone coalesce(tz.name, 'America/New_York'), (ss.interval__c||' minute')::interval) as time on true
+  join generate_series(salesforce.round_minutes($2, ss.interval__c)::timestamp at time zone 'UTC' at time zone coalesce(tz.name, 'America/New_York'), ($3)::timestamp at time zone 'UTC' at time zone coalesce(tz.name, 'America/New_York'), (ss.interval__c||' minute')::interval) as time on true
    -- First reduce the returned times by any that share the same day of week as an avalibility and are within start and end time of that avalibility
    -- This will remove all times that fall outside any know avalibilities for a given schedule
    join (
@@ -235,10 +231,10 @@ BEGIN
                         a1.day_of_week__c as dow,
                         a1.start_date__c as start_date_time,
                         a1.end_date__c as end_date_time
-                 FROM %schemaName%.sc_availability__c a1
-                WHERE a1.schedule__r__sid__c = (SELECT sid__c from %schemaName%.sc_schedule__c WHERE calendar__r__sid__c =  $1 LIMIT 1)
+                 FROM salesforce.sc_availability__c a1
+                WHERE a1.schedule__r__sid__c = (SELECT sid__c from salesforce.sc_schedule__c WHERE calendar__r__sid__c =  $1 LIMIT 1)
               ) as aa
-             WHERE aa.schedule_sid = (SELECT sid__c from %schemaName%.sc_schedule__c WHERE calendar__r__sid__c = $1 LIMIT 1)
+             WHERE aa.schedule_sid = (SELECT sid__c from salesforce.sc_schedule__c WHERE calendar__r__sid__c = $1 LIMIT 1)
           ) a
        on a.schedule_sid = ss.sid__c
 
@@ -247,9 +243,9 @@ BEGIN
            (extract(dow from (time )) = a.dow)
           AND (time )::time BETWEEN a.start_time and a.end_time
           AND (time)::time + ($4  || ' minute')::interval BETWEEN a.start_time and a.end_time
-
-          )
           AND ((time )::date BETWEEN a.start_date_time AND a.end_date_time)
+          )
+
 where 0=0
    AND (time)::timestamp at time zone coalesce(tz.name, 'America/New_York') at time zone 'UTC' BETWEEN $2 AND $3
    AND c.sid__c = $1
@@ -257,19 +253,25 @@ where 0=0
 
  AND NOT EXISTS (
                  SELECT 1
-                 FROM %schemaName%.sc_appointment__c app
+                 FROM salesforce.sc_appointment__c app
                  WHERE (app.start_date__c BETWEEN $2 AND $3 or app.end_date__c between $2 AND $3)
-                        and ((app.start_date__c, app.end_date__c) OVERLAPS (time,time + ($4 || ' minute')::interval + INTERVAL '1 minute' * ss.end_buffer__c))
+                        -- since we are dealing with the variable time in the schedules local timezone, we need to convert it back to UTC so we can check the appointment dates in the database.
+                        and ((app.start_date__c, app.end_date__c) OVERLAPS (time  at TIME ZONE coalesce(tz.name, 'America/New_York') at TIME ZONE 'UTC' ,time  at TIME ZONE coalesce(tz.name, 'America/New_York') at TIME ZONE 'UTC' + ($4 || ' minute')::interval + INTERVAL '1 minute' * ss.end_buffer__c))
                         and app.seat__r__sid__c = s.sid__c
+                        AND app.status__c <> 'cancelled'
  )
   AND NOT EXISTS (
                  SELECT 1
-                 FROM %schemaName%.sc_availability_exclusion__c ave
-                 where ave.schedule__r__sid__c = ss.sid__c and (extract(dow from time) = ave.day_of_week__c) and (time::time BETWEEN ave.start_time__c and ave.end_time__c or (time + ($4 || ' minute')::interval)::time BETWEEN ave.start_time__c and ave.end_time__c) and ((time BETWEEN ave.start_date__c and ave.end_date__c) or (ave.start_date__c is null or ave.end_date__c is null))
+                 FROM salesforce.sc_availability_exclusion__c ave
+                 WHERE ave.schedule__r__sid__c = ss.sid__c
+                       AND (extract(dow from time) = ave.day_of_week__c)
+                       AND (time::time BETWEEN ave.start_time__c AND ave.end_time__c
+                            OR (time + ($4 || ' minute')::interval)::time BETWEEN ave.start_time__c AND ave.end_time__c)
+                       AND ((time BETWEEN ave.start_date__c AND ave.end_date__c) OR (ave.start_date__c is null OR ave.end_date__c is null))
    )
 
   ORDER BY time;
- END
+  END
 $function$
 ;
 
